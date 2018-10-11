@@ -39,13 +39,12 @@
       console.log("onload=======================")
       await this.$parent.login(e);
       this.height = wepy.getSystemInfoSync().windowHeight
-      // const location = await wepy.getLocation({
-      //     type: 'gcj02'
-      //   });
-      // this.markers[0].latitude = location.latitude;
-      // this.markers[0].longitude = location.longitude;
-      // this.latitude = location.latitude;
-      // this.longitude = location.longitude;
+      const location = await wepy.getLocation({
+          type: 'gcj02'
+        });
+      this.latitude = location.latitude;
+      this.longitude = location.longitude;
+      this.$apply()
       // this.mapCtx = wx.createMapContext('map'); 
       // this.mapCtx.moveToLocation();
       await this.getTraces();
@@ -190,39 +189,29 @@
         this.range_y = this.range_y - this.longitude;
         this.$apply();
       }
-      let self = this;
-      await this.mapCtx.getCenterLocation({
-        success:function(res){
-          self.latitude = res.latitude;
-          self.longitude = res.longitude;
-          console.log("res-------------------",res)
-          let url = baseUrl + `/trace/getTraces?latitude=${self.latitude}&longitude=${self.longitude}&range_x=${self.range_x}&range_y=${self.range_y}`;
-          //console.log(this.latitude,this.longitude,this.range_x,this.range_y)
-          const traces = req.get(url).catch((err)=>{
-            console.log("updateAvatarError...", err.data)})
-          if (traces.data) {
-            let data = traces.data.data;
-            let scenices = _.groupBy(data,function(obj){return obj.scenic});
-            console.log("scenices==============",scenices)
-            let k = 0;
-            for(var i in scenices) {
-              let marker = {};
-              k = k + 1;
-              marker['id'] = k;
-              marker['latitude'] = scenices[i][0].latitude;
-              marker['longitude'] = scenices[i][0].longitude;
-              marker['width'] = 30;
-              marker['height'] = 30;
-              marker['name'] = i;
-              marker['traceIds'] = _.pluck(scenices[i], 'id');
-              marker['avatars'] = _.pluck(scenices[i], 'avatar');
-              self.markers.push(marker);
-            }
-          }
-          self.$apply();
+      let url = baseUrl + `/trace/getTraces?latitude=${this.latitude}&longitude=${this.longitude}&range_x=${this.range_x}&range_y=${this.range_y}`;
+      //console.log(this.latitude,this.longitude,this.range_x,this.range_y)
+      const traces = req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      if (traces.data) {
+        let data = traces.data.data;
+        let scenices = _.groupBy(data,function(obj){return obj.scenic});
+        console.log("scenices==============",scenices)
+        let k = 0;
+        for(var i in scenices) {
+          let marker = {};
+          k = k + 1;
+          marker['id'] = k;
+          marker['latitude'] = scenices[i][0].latitude;
+          marker['longitude'] = scenices[i][0].longitude;
+          marker['width'] = 30;
+          marker['height'] = 30;
+          marker['name'] = i;
+          marker['traceIds'] = _.pluck(scenices[i], 'id');
+          marker['avatars'] = _.pluck(scenices[i], 'avatar');
+          this.markers.push(marker);
         }
-      })
-      
+      }
       console.log("markers==========",this.markers)
      // await this.drawAvatar(this.markers);
       this.$apply();
