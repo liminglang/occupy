@@ -1,0 +1,164 @@
+<style lang="less">
+  .photo {
+    margin-top: 20px;
+    width:60%;
+    height:150px;
+    margin-left: auto; margin-right: auto;
+    border:solid 1px #000;
+  }
+  
+  .confirm {
+    margin-top: 20px;
+    height: 30px;
+    width: 80px;
+    display: table;
+  }
+  .gps {
+    height: 15px;
+    width: 15px;
+  }
+  .image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  .name {
+    flex: 1;
+    display: flex;
+    margin-left: 10px;
+  }
+  .declaration {
+
+  }
+  .button {
+    flex-direction: column;
+    align-items: center;
+    background-color: #5346c5;
+    height: 46px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+  }
+  .qrcode {
+    height: 70px;
+    width: 70px;
+  }
+  .canvas {
+    width: 100%;
+    position: absolute;
+   /// height: 100px;
+    //bottom: 50px;
+  }
+</style>
+<template>
+    <view>
+      <canvas canvas-id="myCanvas" class="canvas" style='height:{{canvasHeight}}px'/>
+      <view>
+        <button class="button" @tap="saveImageToPhotosAlbum">保存到手机</button>
+      </view>
+    </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  import { baseUrl, appId} from '@/config'
+  import req from '@/network'
+  export default class Post extends wepy.page {
+    config = {
+      navigationBarTitleText: '足迹占领'
+    } 
+    data = {
+      content:'',
+      locationName:'',
+      nickName: '',
+      avatar:'',
+      dateString:'',
+      imageUrl:'',
+      canvasHeight:100
+    }
+    async onLoad(e) {
+      this.nickName = this.$parent.globalData.user.name;
+      this.avatar = this.$parent.globalData.user.avatar;
+      this.locationName = e.locationName;
+      this.content = e.content;
+      this.dateString = e.dateString;
+      const self = this
+      const ctx = wepy.createCanvasContext('myCanvas');
+      const width = wepy.getSystemInfoSync().windowWidth;
+      const height = wepy.getSystemInfoSync().windowHeight-50;
+      this.canvasHeight = height;
+      console.log("canvasHeight===========",this.canvasHeight)
+      this.$apply();
+      ctx.rect(5,5,width-10,height-10)
+      ctx.stroke()
+    //   //const radius = width * 105/430
+      ctx.setFontSize(14);
+      ctx.fillText(this.nickName,105,35);
+      ctx.fillText(this.content,90,65);
+      ctx.fillText(this.dateString,15, height-80);
+      ctx.fillText(this.locationName,30, height-40);
+      ctx.save();
+      ctx.restore();
+      ctx.beginPath()
+      ctx.drawImage("/static/images/test.jpg",5, 85, width-10, height-180);
+      ctx.drawImage("/static/images/address.png",10, height-55, 13, 20);
+      ctx.stroke()
+      
+      ctx.save();
+      ctx.beginPath()
+      ctx.arc(45, 45, 35, 0, 2 * Math.PI);
+      ctx.arc(width-70, height-45, 40, 0, 2 * Math.PI);
+     // ctx.stroke();
+      ctx.clip();
+      ctx.drawImage(this.avatar, 10, 10, 70, 70);
+      ctx.drawImage("/static/images/qrcode.jpg", width-110, height-85, 80, 80);
+      ctx.save()
+      ctx.draw(true, async ()=>{
+        const res = await wepy.canvasToTempFilePath({
+          x:0,
+          y:0,
+          width:width,
+          height:height,
+          destWidth:width,
+          destHeight:height,
+          canvasId: 'myCanvas',
+          fileType: 'jpeg'
+        });
+        self.imageUrl = res.tempFilePath;
+        self.$apply();
+      })
+    }
+
+    methods = {
+      async saveImageToPhotosAlbum(){  
+        const saveRes = await wepy.saveImageToPhotosAlbum({
+          filePath: this.imageUrl
+        }).catch((err)=>{
+          return false;
+        });
+        if(saveRes){
+          wepy.showToast({
+            title: "已保存至相册",
+            icon: "none"
+          });
+        }
+        else{
+          wepy.showToast({
+            title: "保存失败",
+            icon: "none"
+          });
+          wepy.showLoading({
+            title: '加载中',
+            mask: true
+          });
+          const setting = await wepy.getSetting();
+          if(setting.authSetting["scope.writePhotosAlbum"] === false){
+            this.showOpenSetting = true;
+            this.$apply();
+          }
+          wepy.hideLoading();
+        }
+      }
+    }
+  }
+</script>

@@ -1,0 +1,45 @@
+.startbutton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.weui-textarea-input {
+  display: block;
+  width: 100%;
+}
+.text {
+  width: 90%;
+  border: 1px solid #EBEBEB;
+  min-height: 24px;
+  background-color: #FFF;
+  border-radius: 5px 5px;
+  overflow-y: auto;
+  font-size: 0.9em;
+  align-content: center;
+  margin-left: 15px;
+  margin-right: 40px;
+  margin-top: 10px;
+}
+.photo {
+  margin-top: 20px;
+  width: 60%;
+  height: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  border: solid 1px #000;
+}
+.cross {
+  height: 30px;
+  width: 30px;
+  margin-top: 60px;
+}
+.confirm {
+  margin-top: 20px;
+  height: 30px;
+  width: 80px;
+  display: table;
+}
+.gps {
+  height: 30px;
+  width: 30px;
+}

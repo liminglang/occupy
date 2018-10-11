@@ -1,0 +1,7 @@
+
+    <view>
+      <canvas canvas-id="myCanvas" class="canvas" style="height:{{canvasHeight}}px"/>
+      <view>
+        <button class="button" bindtap="saveImageToPhotosAlbum">保存到手机</button>
+      </view>
+    </view>

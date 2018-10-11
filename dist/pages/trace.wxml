@@ -1,0 +1,7 @@
+
+  <view class="weui-cell">
+    <view class="weui-cell__bd">
+      <view class="text">占领宣言</view>
+      <textarea class="weui-textarea-input"/>
+    </view>
+</view>

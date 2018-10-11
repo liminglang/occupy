@@ -1,0 +1,4 @@
+
+  <view class="startbutton">
+    <button bindtap="startGame">回到首页</button>
+  </view>

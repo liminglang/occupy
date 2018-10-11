@@ -1,0 +1,152 @@
+<style lang="less">
+  .startbutton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .weui-textarea-input{
+      display:block;
+      width:100%;
+    }
+  .text {
+    width:90%;
+    border:1px solid #EBEBEB;
+    min-height:24px;
+    background-color:#FFF;
+    border-radius:5px 5px;
+    overflow-y:auto;
+    font-size:0.9em;
+    align-content:center;
+    margin-left:15px;
+    margin-right:40px;
+    margin-top:10px;
+  }
+  .photo {
+    margin-top: 20px;
+    width:60%;
+    height:150px;
+    margin-left: auto; margin-right: auto;
+    border:solid 1px #000;
+  }
+  .cross {
+    height: 30px;
+    width: 30px;
+    margin-top: 60px;
+  }
+  .confirm {
+    margin-top: 20px;
+    height: 30px;
+    width: 80px;
+    display: table;
+  }
+  .gps {
+    height: 30px;
+    width: 30px;
+  }
+</style>
+<template>
+    <view>
+      <view>占领宣言：</view>
+        <textarea class='text' rows="3" cols="20">{{content}}</textarea>    
+      <view class='photo'>
+        <view class="startbutton">
+          <image class="cross" src="{{imageUrl}}" @tap='uploadPhoto'></image>
+        </view>
+      </view>
+      <view class="weui-cell">
+        <navigator url="/pages/location"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__hd">
+            <image class="gps" src="/static/images/address.png"></image>
+          </view>
+          <view class="weui-cell__bd">{{city}},{{locationName}}</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+        </navigator>
+      </view>
+      <view class="confirm">
+        <button open-type="getUserInfo" bindgetuserinfo="confirm">确认</button>
+      </view>
+    </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import req from '@/network'
+  import { baseUrl, txMapsKey} from '@/config'
+  export default class Occupy extends wepy.page {
+    config = {
+      navigationBarTitleText: '足迹占领'
+    }
+    data = {
+      content:'',
+      city:'',
+      locationName:'',
+      longitude:'',
+      latitude:'',
+      imageUrl:'/static/images/ic_menu_topic_nor.png'
+    }
+    async onLoad(e) {
+      console.log(e)
+      if(e.latitude && e.longitude){
+        this.latitude = e.latitude;
+        this.longitude = e.longitude;
+      }
+      if(e.locationName){
+        this.locationName = e.locationName
+      }
+      this.content = this.$parent.globalData.user.name +'到此一游！';
+      await this.getCityNameFromTX(e.latitude,e.longitude);
+      this.$apply();
+    }
+    async getCityNameFromTX(latitude, longitude) {
+
+      const url = `https://apis.map.qq.com/ws/geocoder/v1/?location=${latitude},${longitude}&key=${txMapsKey}`;
+      const res = await wepy.request({url: url, method: 'GET'}).catch((err)=>{
+        console.log("error...",err.data);
+        return {}
+      });
+      console.log(res.data.result);
+      this.city = res.data.result.ad_info.city;
+      if(!this.locationName) {
+        this.locationName = res.data.result.address_reference.famous_area.title;
+      } 
+    }
+    methods = {
+      startGame() {
+        wx.navigateTo({url: '/pages/index'})
+      },
+      async uploadPhoto(){
+        let res = await wepy.chooseImage({
+          count: 1,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['album', 'camera']
+        })
+        console.log("tempFilePaths==============",res.tempFilePaths[0]);
+        this.imageUrl = res.tempFilePaths[0];
+        this.$apply();
+      },
+      async confirm(e) {
+        const userInfo = e.detail.userInfo;
+        console.log(userInfo)
+        if (userInfo) {
+          if (!this.$parent.globalData.userInfo) {
+            const setting = await wepy.getSetting()
+            if (setting.authSetting['scope.userInfo']) {
+              const info = await wepy.getUserInfo()
+              this.$parent.globalData.userInfo = info.userInfo
+              let url = baseUrl + '/auth/updateUser'
+              const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': info.userInfo.avatarUrl, 'gender': info.userInfo.gender}
+              await req.post(url, setData).catch((err)=>{
+                console.log("updateAvatarError...", err.data)})
+              this.$parent.globalData.user.name = info.userInfo.nickName;
+              this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
+            }
+          }         
+        }
+        let url = baseUrl + '/trace/addTrace';
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content, 'avatar': this.$parent.globalData.user.avatar  }
+        await req.post(url, setData).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})   
+        wx.switchTab({url: '/pages/index'})
+      }
+    }
+  }
+</script>

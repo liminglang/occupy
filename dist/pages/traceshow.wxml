@@ -1,0 +1,30 @@
+
+    <view>
+      <view class="weui-cell">
+        <view class="weui-media-box weui-media-box_appmsg">
+          <image class="image" mode="aspectFit" src="{{avatar}}"/>
+          <view class="name">
+            {{nickName}}
+          </view>
+          <view class="declaration">
+            {{content}}
+          </view>
+        </view>
+      </view>
+      <view class="weui-cell">
+        <navigator url="/pages/location" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__hd">
+            <image class="gps" src="/static/images/address.png"/>
+          </view>
+          <view class="name" style="color:#c1c40d">{{locationName}}</view>
+          <view class="name" style="margin-right:20px">{{dateString}}</view>
+        </navigator>
+      </view>
+      <view class="photo">
+        <image src="{{imageUrl}}" bindtap="uploadPhoto"/>
+      </view>
+      <view>
+        <button class="button" open-type="share">分享给好友</button>
+        <button class="button" bindtap="getPost">生成海报</button>
+      </view>
+    </view>

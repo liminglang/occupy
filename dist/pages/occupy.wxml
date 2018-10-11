@@ -1,0 +1,22 @@
+
+    <view>
+      <view>占领宣言：</view>
+        <textarea class="text" rows="3" cols="20">{{content}}</textarea>    
+      <view class="photo">
+        <view class="startbutton">
+          <image class="cross" src="{{imageUrl}}" bindtap="uploadPhoto"/>
+        </view>
+      </view>
+      <view class="weui-cell">
+        <navigator url="/pages/location" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+          <view class="weui-cell__hd">
+            <image class="gps" src="/static/images/address.png"/>
+          </view>
+          <view class="weui-cell__bd">{{city}},{{locationName}}</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access"/>
+        </navigator>
+      </view>
+      <view class="confirm">
+        <button open-type="getUserInfo" bindgetuserinfo="confirm">确认</button>
+      </view>
+    </view>
