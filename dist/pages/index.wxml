@@ -1,14 +1,15 @@
 
   <view>
     <map class="map" style="height:{{height}}px" id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location="show-location"/>
-
-    <!-- <button type="primary" bindtap="getCenterLocation">获取位置</button> -->
-    <canvas canvas-id="myCanvas" style="height:300px;width:150px;margin-top:-10000px"/>
-    <!-- <image  src="{{imageUrl}}"></image> -->
-    <!-- <button type="primary" bindtap="moveToLocation">移动位置</button>
+    <button class="button" bindtap="disPlay">{{buttonContent}}</button>
+    <canvas canvas-id="myCanvas" style="height:300px;width:150px;"/>
+    <!-- <button type="primary" bindtap="getCenterLocation">获取位置</button>
+    <canvas canvas-id="myCanvas" style='height:300px;width:150px;s'/>
+    <image  src="{{imageUrl}}"></image>
+    
     <button type="primary" bindtap="translateMarker">移动标注</button>
-    <button type="primary" bindtap="includePoints">缩放视野展示所有经纬度</button> -->
-    <!-- <view class="startbutton">
+    <button type="primary" bindtap="includePoints">缩放视野展示所有经纬度</button>
+    <view class="startbutton">
       <button open-type="getUserInfo" bindgetuserinfo="userLogin">开始游戏</button>
     </view> -->
   </view>

@@ -1,5 +1,61 @@
-.startbutton {
+.container {
+  height: 100%;
+  width: 100%;
+}
+.list {
+  margin-top: 15px;
+}
+.gps {
+  height: 30px;
+  width: 30px;
+}
+.image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.content {
+  flex: 1;
+  margin-left: 10px;
+  text-overflow: ellipsis;
+}
+.declaration {
+  flex: 1;
+  margin-left: 10px;
+  width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.location {
+  flex: 1;
+  margin-left: 10px;
+  display: inline-block;
+  color: #c1c40d;
+}
+.button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  display: inline;
+  background-color: #ffffff;
+  margin-left: 30px;
+}
+.address-list {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 31.25rpx;
+  background: #fff url(http://yanxuan.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/address-bg-bd30f2bfeb.png) 0 0 repeat-x;
+  background-size: auto 10.5rpx;
+  margin-bottom: 90rpx;
+}
+.text {
+  display: inline-block;
+  margin-left: 10px;
+}
+.heart {
+  display: inline-block;
+  margin-right: 30px;
+  height: 25px;
+  width: 25px;
 }

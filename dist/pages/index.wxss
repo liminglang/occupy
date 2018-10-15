@@ -7,3 +7,7 @@ map {
   width: 100%;
   bottom: 0;
 }
+.button {
+  position: fixed;
+  top: 0;
+}

@@ -1,27 +1,151 @@
 <style lang="less">
-  .startbutton {
+  .container {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .list {
+    margin-top: 15px;
+    
+  }
+  .gps {
+    height: 30px;
+    width: 30px;
+  }
+  .image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  .content {
+    flex: 1;
+    margin-left: 10px;
+    text-overflow:ellipsis;
+  }
+  .declaration {
+    flex: 1;
+    margin-left: 10px;
+    text-overflow:ellipsis;
+    width:50px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+  }
+  .location{
+    flex: 1;
+    margin-left: 10px;
+    display:inline-block;
+    color:#c1c40d
+  }
+  .button {
     display: flex;
     flex-direction: column;
     align-items: center;
+    display:inline;
+    background-color: #ffffff;
+    margin-left: 30px;
   }
+  .address-list {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 31.25rpx;
+    background: #fff
+      url(http://yanxuan.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/address-bg-bd30f2bfeb.png)
+      0 0 repeat-x;
+    background-size: auto 10.5rpx;
+    margin-bottom: 90rpx;
+  }
+  .text {
+    display:inline-block;
+    margin-left: 10px;
+  }
+ .heart{
+      display:inline-block;
+      margin-right: 30px;
+      height: 25px;
+      width: 25px;
+    }
 </style>
 <template>
-  <view class="startbutton">
-    <button @tap="startGame">回到首页</button>
+  <view>
+    <repeat for="{{list}}" key="index" index="index" item="item">
+      <view class="list">
+        <image class="image" mode="aspectFit" src="{{item.avatar}}" @tap='showTrace({{item.id}})'></image>
+        <view class='text'>
+          <view class='content'>{{item.name}}</view>
+          <view class='content'>
+            <view class='declaration'>{{item.declaration}}</view>
+            <image class="heart" mode="aspectFit" src="/static/images/heart.png" @tap='changeParisecount({{item.id}}, {{index}})'></image>
+            <view style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
+          </view>
+          <image class="gps" src="/static/images/address.png"></image>
+          <view class='location'>{{item.scenic}}</view>
+        </view>
+      </view>
+    </repeat>
   </view>
+    <!-- <view class="weui-cell">
+      <navigator url="/pages/location"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+        <view class="weui-cell__hd">
+          <image class="gps" src="/static/images/address.png"></image>
+        </view>
+        <view class="name" style='color:#c1c40d'>{{locationName}}</view>
+        <view class='name' style='margin-right:20px'>{{dateString}}</view>
+      </navigator>
+    </view>
+  </view> -->
 </template>
 <script>
   import wepy from 'wepy'
+  import 'wepy-async-function'
+  import { baseUrl, appId} from '@/config'
+  import req from '@/network'
+  import _ from 'underscore'
   export default class Tracelist extends wepy.page {
     config = {
       navigationBarTitleText: '足迹占领'
+    }
+    data = {
+      scenic:'',
+      list:[],
+      isParised:false
     } 
     async onLoad(e) {
-      console.log(this.$parent.globalData.user.name)
+      if(e.scenic){
+        this.scenic = e.scenic;
+      }
+      let url = baseUrl + `/trace/getList?latitude=${e.latitude}&longitude=${e.longitude}`;
+      //console.log(this.latitude,this.longitude,this.range_x,this.range_y)
+      const traces = await req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      if (traces.data.data) {
+        this.list = traces.data.data;
+        this.$apply();
+      }
+      console.log("this.list",this.list)
     }
     methods = {
       startGame() {
         wx.navigateTo({url: '/pages/index'})
+      },
+      showTrace(traceId){
+        wx.navigateTo({url: `/pages/traceshow?traceId=${traceId}`})
+      },
+      async changeParisecount(traceId, index){
+        console.log("index==========",index)
+        if(this.isParised){
+          this.list[index].parisecount--;
+          this.isParised = false;
+        }else{
+          this.list[index].parisecount++;
+          this.isParised = true;
+        }
+        this.$apply();
+        console.log(this.list[index].parisecount);
+        let url = baseUrl + `/trace/updateTrace?id=${traceId}`
+        const setData = {'parisecount': this.list[index].parisecount}
+        await req.post(url, setData).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})
       }
     }
   }

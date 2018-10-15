@@ -8,18 +8,23 @@
     width: 100%;
     bottom: 0;
   }
+  .button{
+    position: fixed;
+    top: 0
+  }
 </style>
 <template>
   <view>
     <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location ></map>
-
-    <!-- <button type="primary" @tap="getCenterLocation">获取位置</button> -->
-    <canvas canvas-id="myCanvas" style='height:300px;width:150px;margin-top:-10000px'/>
-    <!-- <image  src="{{imageUrl}}"></image> -->
-    <!-- <button type="primary" bindtap="moveToLocation">移动位置</button>
+    <button class='button' @tap="disPlay">{{buttonContent}}</button>
+    <canvas canvas-id="myCanvas" style='height:300px;width:150px;'/>
+    <!-- <button type="primary" @tap="getCenterLocation">获取位置</button>
+    <canvas canvas-id="myCanvas" style='height:300px;width:150px;s'/>
+    <image  src="{{imageUrl}}"></image>
+    
     <button type="primary" bindtap="translateMarker">移动标注</button>
-    <button type="primary" bindtap="includePoints">缩放视野展示所有经纬度</button> -->
-    <!-- <view class="startbutton">
+    <button type="primary" bindtap="includePoints">缩放视野展示所有经纬度</button>
+    <view class="startbutton">
       <button open-type="getUserInfo" bindgetuserinfo="userLogin">开始游戏</button>
     </view> -->
   </view>
@@ -44,25 +49,33 @@
         });
       this.latitude = location.latitude;
       this.longitude = location.longitude;
+      this.mapCtx = wx.createMapContext('map'); 
+      this.mapCtx.moveToLocation();
+      await this.getRegion();
       this.$apply()
+      console.log(this.latitude,this.longitude)
       // this.mapCtx = wx.createMapContext('map'); 
       // this.mapCtx.moveToLocation();
-      await this.getTraces();
-      await this.drawAvatar(this.markers);
+      
       //根据经纬度和userid去trace表中查找，当前位置我是否已经占领了，如果占领了，就显示头像，否则显示占领按钮
       this.isOccupied = true;
-      if(this.isOccupied){
-        this.markers[0].iconPath = 'https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLPlaI4hfpwT2x1ePByeZibSl3snWZGNIhLGJ2Z39E7ea4v36rjP5xI7GZVBllHCAGtm8KpPdxoyWg/132'
-      }
-      console.log(this.markers);
+      let self = this;
+      if(this.isDisplay){
+        setTimeout(() => {
+          self.getTraces()
+        }, 200);
+        setTimeout(() =>{
+          self.drawAvatar(self.markers)
+        },1000);
+      }      
       this.$apply();
     }
 
     async onShow(e) {
     //  this.mapCtx = wx.createMapContext('map'); 
     //  this.mapCtx.moveToLocation();
-      console.log("onshow======================")
-      await this.getTraces();
+   //   console.log("onshow======================")
+   //   await this.getTraces();
     }
     data = {
       isOccupied:false,
@@ -72,7 +85,7 @@
       latitude: 0,
       longitude: 0,
       markers:[{    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-        iconPath: " ",
+        iconPath: '',
         id: 0,
         name: '卧槽',
         latitude: '',
@@ -106,7 +119,9 @@
       }
       ],
       range_x: 0,
-      range_y: 0
+      range_y: 0,
+      isDisplay:true,
+      buttonContent:'不显示占领者'
     }
     async updated(e) {
       console.log(e.type)
@@ -118,12 +133,12 @@
       this.$apply();
     }
     markertap(e) {
-      console.log(this.markers[e.markerId].traceId);
+      console.log(666666666666666);
       if(this.isOccupied){
         if(this.markers[e.markerId].traceIds.length==1){
           wx.navigateTo({url: `/pages/traceshow?traceId=${this.markers[e.markerId].traceIds[0]}`})
         }else{
-          wx.navigateTo({url: `/pages/tracelist?latitude=${this.markers[e.markerId].latitude}&longitude=${this.markers[e.markerId].longitude}`})
+          wx.navigateTo({url: `/pages/tracelist?latitude=${this.markers[e.markerId].latitude}&longitude=${this.markers[e.markerId].longitude}&scenic=${this.markers[e.markerId].name}`})
         }
       }else{
         wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
@@ -157,32 +172,34 @@
           self.range_x = res.northeast.latitude;
           self.range_y = res.northeast.longitude;
           self.$apply();
+          console.log("region======1111",self.range_x,self.range_y)
         }
       });
+      console.log("region======",this.range_x,this.range_y)
     }
     initMarkers(){
       this.markers = []
       this.$apply();
       this.markers.push(
         {    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-          iconPath: " ",
+          iconPath: "",
           id: 0,
           name: '卧槽',
-          latitude: '',
-          longitude: '',
+          latitude: this.latitude,
+          longitude: this.longitude,
           width: 30,
           height: 30,
           traceIds: [],
-          avatars: []
+          avatars:[]
         }
       );
+      if(this.isOccupied){
+        this.markers[0].avatars.push('https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLPlaI4hfpwT2x1ePByeZibSl3snWZGNIhLGJ2Z39E7ea4v36rjP5xI7GZVBllHCAGtm8KpPdxoyWg/132')
+      }
       this.$apply();
     }
     async getTraces(){
       this.initMarkers();
-      this.mapCtx = wx.createMapContext('map'); 
-      this.mapCtx.moveToLocation();
-      await this.getRegion();
     //  await this.getCenterLocation();
       if(this.range_x>=1 || this.range_y>=1){
         this.range_x = this.range_x - this.latitude;
@@ -191,7 +208,7 @@
       }
       let url = baseUrl + `/trace/getTraces?latitude=${this.latitude}&longitude=${this.longitude}&range_x=${this.range_x}&range_y=${this.range_y}`;
       //console.log(this.latitude,this.longitude,this.range_x,this.range_y)
-      const traces = req.get(url).catch((err)=>{
+      const traces = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
       if (traces.data) {
         let data = traces.data.data;
@@ -212,15 +229,17 @@
           this.markers.push(marker);
         }
       }
-      console.log("markers==========",this.markers)
      // await this.drawAvatar(this.markers);
       this.$apply();
     }
     async drawAvatar(markers){
+      console.log("4444444444444",markers)
       let self = this
       const ctx = wepy.createCanvasContext('myCanvas');
       ctx.beginPath()
+      console.log(markers.length)
       for(var j=0; j < markers.length; j++){
+        console.log(markers[j].avatars[0])
         for(var i=0; i < markers[j].avatars.length; i++){
           ctx.arc(15+i*30, 15+j*30, 15, 0, 2 * Math.PI);
         }
@@ -246,12 +265,24 @@
             fileType: 'jpeg',
           });
           // if(markers[j].name=='市政府'){
-            self.imageUrl = res.tempFilePath
-            markers[j]['iconPath'] = res.tempFilePath
+          console.log("res.tempFilePath===================",res.tempFilePath)
+          self.imageUrl = res.tempFilePath
+          markers[j]['iconPath'] = res.tempFilePath
+          const saveRes = await wepy.saveImageToPhotosAlbum({
+            filePath: res.tempFilePath
+          }).catch((err)=>{
+            return false;
+          });
+          if(saveRes){
+            wepy.showToast({
+              title: "已保存至相册",
+              icon: "none"
+            });
+          }
         }
       })
      
-      // 
+      console.log("********************",this.markers) 
       this.$apply()
     }
     methods = {
@@ -283,7 +314,21 @@
       
       async getCenterLocation(){
         await this.getCenterLocation()
+      },
+
+      disPlay(){
+        if(this.isDisplay){
+          this.isDisplay = false;
+          this.buttonContent = '显示占领者';
+        }else{
+          this.isDisplay = true;
+          this.buttonContent = '不显示占领者'
+        }
+        this.$apply();
+        this.initMarkers();
+        this.onLoad();
       }
+      
     }
   }
 </script>

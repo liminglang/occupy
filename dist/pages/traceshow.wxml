@@ -24,7 +24,12 @@
         <image src="{{imageUrl}}" bindtap="uploadPhoto"/>
       </view>
       <view>
-        <button class="button" open-type="share">分享给好友</button>
-        <button class="button" bindtap="getPost">生成海报</button>
+        <block  wx:if="{{isOwner}}">
+          <button class="button" open-type="share">分享给好友</button>
+          <button class="button" bindtap="getPost">生成海报</button>
+        </block>
+        <block  wx:else>
+          <button class="button" open-type="share">分享给好友</button>
+        </block>
       </view>
     </view>
