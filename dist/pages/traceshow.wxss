@@ -6,24 +6,43 @@
   margin-right: auto;
   border: solid 1px #000;
 }
-.confirm {
-  margin-top: 20px;
-  height: 30px;
-  width: 80px;
-  display: table;
-}
 .gps {
   height: 30px;
   width: 30px;
 }
 .image {
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
 }
-.name {
+.content {
   flex: 1;
   margin-left: 10px;
+  text-overflow: ellipsis;
+}
+.declaration {
+  flex: 1;
+  margin-left: 10px;
+  width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.location {
+  flex: 1;
+  margin-left: 10px;
+  display: inline-block;
+  color: #c1c40d;
+}
+.text {
+  display: inline-block;
+  margin-left: 10px;
+}
+.heart {
+  display: inline-block;
+  margin-right: 30px;
+  height: 25px;
+  width: 25px;
 }
 .button {
   display: flex;

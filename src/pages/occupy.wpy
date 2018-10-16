@@ -43,14 +43,66 @@
     height: 30px;
     width: 30px;
   }
+  .flex {
+    display:flex;
+  }
+  .up-pic {
+    width: 100%;
+    justify-content: center;
+  }
+  .pic-box{  
+    margin-top:20rpx;  
+    flex-flow:wrap;  
+    width:95%;   
+  } 
+  .ap-box{  
+    position: relative;  
+  }
+  .add-pic{  
+    width: 160rpx;  
+    height: 160rpx;  
+    margin-right: 20rpx;  
+    position: relative;  
+    margin: 20rpx 30rpx 20rpx 30rpx;  
+  } 
+  .img-de{  
+    width:45rpx;  
+    height:45rpx;  
+    border-radius:50%;  
+    position:absolute;  
+    right:-41rpx;  
+    top:5rpx;  
+  }
+  .hong-contant .teamwork-btn{
+    width: 360rpx;
+    height: 88rpx; 
+    border-radius: 50rpx;
+    color: white; 
+    background-color:#14a1fd; 
+    margin: 0 auto;
+    margin-top: 80rpx;
+    margin-bottom: 40rpx;
+  }
 </style>
 <template>
     <view>
       <view>占领宣言：</view>
         <textarea class='text' rows="3" cols="20">{{content}}</textarea>    
-      <view class='photo'>
-        <view class="startbutton">
-          <image class="cross" src="{{imageUrl}}" @tap='uploadPhoto'></image>
+      <view class='up-pic'>
+        <view class='flex pic-box'>
+          <block wx:key="imgbox" wx:for="{{imgbox}}">
+            <view class='ap-box'>
+              <view class='add-pic'>
+                <image class='add-pic' src='{{item}}'></image>
+                  <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
+                    <image class='gps' src='/static/images/close_pic.png'></image>
+                  </view>
+              </view>
+            </view>
+          </block>
+          <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
+            <image class='gps' src='/static/images/add_pic.png'></image>
+          </view>
         </view>
       </view>
       <view class="weui-cell">
@@ -81,7 +133,8 @@
       locationName:'',
       longitude:'',
       latitude:'',
-      imageUrl:'/static/images/ic_menu_topic_nor.png'
+      imageUrl:'/static/images/ic_menu_topic_nor.png',
+      imgbox:[]
     }
     async onLoad(e) {
       console.log(e)
@@ -109,20 +162,55 @@
         this.locationName = res.data.result.address_reference.famous_area.title;
       } 
     }
+
     methods = {
       startGame() {
         wx.navigateTo({url: '/pages/index'})
       },
-      async uploadPhoto(){
-        let res = await wepy.chooseImage({
-          count: 1,
-          sizeType: ['original', 'compressed'],
-          sourceType: ['album', 'camera']
+      
+      async uploadPhoto(e){
+        let self = this;
+        wx.showActionSheet({
+          itemList: ['从相册中选择', '拍照'],
+          success: async (res)=> {
+            if (!res.cancel) {
+              var imgbox = self.imgbox;
+              console.log(imgbox)
+              var picid = e.currentTarget.dataset.pic;
+              console.log(picid)
+              var that = this;
+              var n = 9;
+              if (9 > imgbox.length > 0) {
+                n = 9 - imgbox.length;
+              } else if (imgbox.length == 9) {
+                n = 1;
+              }
+              const res = await wepy.chooseImage({
+                count: n,
+                sizeType: ['original', 'compressed'],
+                sourceType: ['album', 'camera']
+              })
+              if (imgbox.length == 0) {
+                imgbox = res.tempFilePaths
+              } else if (9 > imgbox.length) {
+                imgbox = imgbox.concat(res.tempFilePaths);
+              } else {
+                imgbox[picid] = res.tempFilePaths[0];
+              }
+              self.imgbox = imgbox;
+              self.$apply();
+            }
+          }
         })
-        console.log("tempFilePaths==============",res.tempFilePaths[0]);
-        this.imageUrl = res.tempFilePaths[0];
         this.$apply();
       },
+      
+      imgDelete(e){
+        let index = e.currentTarget.dataset.deindex;
+        this.imgbox.splice(index, 1);
+        this.$apply();
+      },
+
       async confirm(e) {
         const userInfo = e.detail.userInfo;
         console.log(userInfo)
@@ -142,7 +230,7 @@
           }         
         }
         let url = baseUrl + '/trace/addTrace';
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content, 'avatar': this.$parent.globalData.user.avatar  }
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content}
         await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})   
         wx.switchTab({url: '/pages/index'})

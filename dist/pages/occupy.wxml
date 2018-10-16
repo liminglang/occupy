@@ -2,9 +2,21 @@
     <view>
       <view>占领宣言：</view>
         <textarea class="text" rows="3" cols="20">{{content}}</textarea>    
-      <view class="photo">
-        <view class="startbutton">
-          <image class="cross" src="{{imageUrl}}" bindtap="uploadPhoto"/>
+      <view class="up-pic">
+        <view class="flex pic-box">
+          <block  wx:key="imgbox" wx:for="{{imgbox}}">
+            <view class="ap-box">
+              <view class="add-pic">
+                <image class="add-pic" src="{{item}}"/>
+                  <view class="img-de" data-deindex="{{index}}" bindtap="imgDelete">
+                    <image class="gps" src="/static/images/close_pic.png"/>
+                  </view>
+              </view>
+            </view>
+          </block>
+          <view class="add-pic" bindtap="uploadPhoto"  wx:if="{{imgbox.length<9}}">
+            <image class="gps" src="/static/images/add_pic.png"/>
+          </view>
         </view>
       </view>
       <view class="weui-cell">

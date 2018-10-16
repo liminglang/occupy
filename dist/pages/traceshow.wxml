@@ -1,24 +1,16 @@
 
     <view>
-      <view class="weui-cell">
-        <view class="weui-media-box weui-media-box_appmsg">
-          <image class="image" mode="aspectFit" src="{{avatar}}"/>
-          <view class="name">
-            {{nickName}}
-          </view>
-          <view class="declaration">
-            {{content}}
-          </view>
+     <image class="image" mode="aspectFit" src="{{avatar}}"/>
+      <view class="text">
+        <view class="content">{{name}}</view>
+        <view class="content">
+          <view class="declaration">{{declaration}}</view>
+          <image class="heart" mode="aspectFit" src="/static/images/heart.png" bindtap="changeParisecount" data-wpychangeparisecount-a="{{id}}"/>
+          <view style="display:inline-block;margin-left:5px;">{{parisecount}}</view>
         </view>
-      </view>
-      <view class="weui-cell">
-        <navigator url="/pages/location" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-          <view class="weui-cell__hd">
-            <image class="gps" src="/static/images/address.png"/>
-          </view>
-          <view class="name" style="color:#c1c40d">{{locationName}}</view>
-          <view class="name" style="margin-right:20px">{{dateString}}</view>
-        </navigator>
+        <image class="gps" src="/static/images/address.png"/>
+        <view class="location">{{scenic}}</view>
+        <view class="text">第{{number}}个占领者</view>
       </view>
       <view class="photo">
         <image src="{{imageUrl}}" bindtap="uploadPhoto"/>

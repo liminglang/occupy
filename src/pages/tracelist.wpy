@@ -60,11 +60,11 @@
     margin-left: 10px;
   }
  .heart{
-      display:inline-block;
-      margin-right: 30px;
-      height: 25px;
-      width: 25px;
-    }
+    display:inline-block;
+    margin-right: 30px;
+    height: 25px;
+    width: 25px;
+  }
 </style>
 <template>
   <view>
@@ -80,6 +80,7 @@
           </view>
           <image class="gps" src="/static/images/address.png"></image>
           <view class='location'>{{item.scenic}}</view>
+          <view class='text'>第{{item.number}}个占领者</view>
         </view>
       </view>
     </repeat>

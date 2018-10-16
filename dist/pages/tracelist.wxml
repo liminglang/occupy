@@ -12,6 +12,7 @@
           </view>
           <image class="gps" src="/static/images/address.png"/>
           <view class="location">{{item.scenic}}</view>
+          <view class="text">第{{item.number}}个占领者</view>
         </view>
       </view>
     </block>
