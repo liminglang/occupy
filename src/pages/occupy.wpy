@@ -145,7 +145,7 @@
       if(e.locationName){
         this.locationName = e.locationName
       }
-      this.content = this.$parent.globalData.user.name +'到此一游！';
+     this.content = this.$parent.globalData.user.name +'到此一游！';
       await this.getCityNameFromTX(e.latitude,e.longitude);
       this.$apply();
     }
@@ -229,11 +229,33 @@
             }
           }         
         }
+        
         let url = baseUrl + '/trace/addTrace';
         const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content}
-        await req.post(url, setData).catch((err)=>{
-          console.log("updateAvatarError...", err.data)})   
-        wx.switchTab({url: '/pages/index'})
+        const result = await req.post(url, setData).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})
+        if(result.data.data.traceId){
+          let self = this;
+          let imgurl = baseUrl + `/image/save`
+          for(var i = 0; i<this.imgbox.length ; i++){
+            (function(i){
+              wx.uploadFile({
+                url: baseUrl + `/image/save?traceId=${result.data.data.traceId}&userId=1`,
+                filePath: self.imgbox[i],
+                name: 'image',
+                formData:{'number':i},
+                header: {
+                  'content-type':'multipart/form-data'
+              },
+                success(res){
+                  console.log(res)
+                }
+              })
+            })(i)
+          }   
+        }
+        
+        //wx.switchTab({url: '/pages/index'})
       }
     }
   }
