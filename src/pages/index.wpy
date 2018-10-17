@@ -224,8 +224,11 @@
       this.initMarkers();
       let self = this;
       setTimeout(async () =>{
-          if(self.range_x>=1 || self.range_y>=1){
+          if(self.range_x>=1){
             self.range_x = self.range_x - self.latitude;
+            self.$apply();
+          }
+          if(self.range_y>=1){ 
             self.range_y = self.range_y - self.longitude;
             self.$apply();
           }

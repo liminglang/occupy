@@ -54,6 +54,33 @@
     background-color: #ffffff;
     margin-left: 30px;
   }
+  .up-pic {
+    width: 100%;
+    justify-content: center;
+  }
+  .pic-box{  
+    margin-top:20rpx;  
+    flex-flow:wrap;  
+    width:95%;   
+  } 
+  .ap-box{  
+    position: relative;  
+  }
+  .add-pic{  
+    width: 160rpx;  
+    height: 160rpx;  
+    margin-right: 20rpx;  
+    position: relative;  
+    margin: 20rpx 30rpx 20rpx 30rpx;  
+  } 
+  .img-de{  
+    width:45rpx;  
+    height:45rpx;  
+    border-radius:50%;  
+    position:absolute;  
+    right:-41rpx;  
+    top:5rpx;  
+  }
 </style>
 <template>
     <view>
@@ -69,8 +96,16 @@
         <view class='location'>{{scenic}}</view>
         <view class='text'>第{{number}}个占领者</view>
       </view>
-      <view class='photo'>
-        <image  src="{{imageUrl}}" @tap='uploadPhoto'></image>
+      <view class='up-pic'>
+        <view class='flex pic-box'>
+          <block wx:key="imgbox" wx:for="{{imgbox}}">
+            <view class='ap-box'>
+              <view class='add-pic'>
+                <image class='add-pic' src='{{item}}'></image>
+              </view>
+            </view>
+          </block>
+        </view>
       </view>
       <view>
         <block wx:if="{{isOwner}}">
@@ -101,7 +136,9 @@
       dateString:'',
       number:'',
       isOwner:false,
-      isParised:false
+      isParised:false,
+      imgbox:[],
+      imageUrl:""
     }
     async onLoad(e) {
       console.log(e.traceId);
@@ -126,6 +163,7 @@
       if(trace.userId == this.$parent.globalData.user.id){
         this.isOwner = true;
       }
+      await this.getImages(e.traceId)
       this.$apply();
     }
 
@@ -137,6 +175,19 @@
         title: title,
         path: path
       };
+    }
+    async getImages(traceId){
+      let url = baseUrl + `/image/get?traceId=${traceId}`;
+      const result = await req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      console.log("result=========",result)
+      console.log(result.data.data);
+      if(result.data.data.imageCount){
+        for(var i=0;i<result.data.data.imageCount;i++){
+          this.imgbox.push(baseUrl+"/static/image/"+traceId+'/'+result.data.data.images[i]) 
+        }
+      }
+      console.log(this.imgbox)
     }
 
     methods = {

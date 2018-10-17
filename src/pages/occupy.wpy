@@ -240,7 +240,7 @@
           for(var i = 0; i<this.imgbox.length ; i++){
             (function(i){
               wx.uploadFile({
-                url: baseUrl + `/image/save?traceId=${result.data.data.traceId}&userId=1`,
+                url: baseUrl + `/image/save?traceId=${result.data.data.traceId}`,
                 filePath: self.imgbox[i],
                 name: 'image',
                 formData:{'number':i},
