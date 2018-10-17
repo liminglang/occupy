@@ -17,12 +17,10 @@
       navigationBarTitleText: '足迹占领'
     } 
     async onLoad(e) {
-      console.log(this.$parent.globalData.user.name);
+      console.log(this.$parent.globalData.user.name,e);
       wx.chooseLocation({
         success: function (res) {    
-          console.log(res,"111111111111")
-          console.log(res.name)
-          wx.navigateTo({url: `/pages/occupy?locationName=${res.name}&latitude=${res.latitude}&longitude=${res.longitude}`})
+          wx.navigateTo({url: `/pages/occupy?locationName=${res.name}&latitude=${res.latitude}&longitude=${res.longitude}&imgbox=${e.imgbox}`})
         }
       }) 
     }

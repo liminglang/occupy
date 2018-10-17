@@ -180,14 +180,11 @@
       let url = baseUrl + `/image/get?traceId=${traceId}`;
       const result = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
-      console.log("result=========",result)
-      console.log(result.data.data);
       if(result.data.data.imageCount){
         for(var i=0;i<result.data.data.imageCount;i++){
           this.imgbox.push(baseUrl+"/static/image/"+traceId+'/'+result.data.data.images[i]) 
         }
       }
-      console.log(this.imgbox)
     }
 
     methods = {

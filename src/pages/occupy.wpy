@@ -106,7 +106,7 @@
         </view>
       </view>
       <view class="weui-cell">
-        <navigator url="/pages/location"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+        <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__hd">
             <image class="gps" src="/static/images/address.png"></image>
           </view>
@@ -145,7 +145,10 @@
       if(e.locationName){
         this.locationName = e.locationName
       }
-     this.content = this.$parent.globalData.user.name +'到此一游！';
+      if(e.imgbox){
+        this.imgbox = e.imgbox.split(',')
+      }
+      this.content = this.$parent.globalData.user.name +'到此一游！';
       await this.getCityNameFromTX(e.latitude,e.longitude);
       this.$apply();
     }
@@ -255,7 +258,7 @@
           }   
         }
         
-        //wx.switchTab({url: '/pages/index'})
+        wx.switchTab({url: '/pages/index'})
       }
     }
   }
