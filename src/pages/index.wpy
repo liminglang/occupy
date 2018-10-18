@@ -287,17 +287,17 @@
             console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
             markers[j]['iconPath'] = res.tempFilePath
           }
-          const saveRes = await wepy.saveImageToPhotosAlbum({
-            filePath: res.tempFilePath
-          }).catch((err)=>{
-            return false;
-          });
-          if(saveRes){
-            wepy.showToast({
-              title: "已保存至相册",
-              icon: "none"
-            });
-          }
+          // const saveRes = await wepy.saveImageToPhotosAlbum({
+          //   filePath: res.tempFilePath
+          // }).catch((err)=>{
+          //   return false;
+          // });
+          // if(saveRes){
+          //   wepy.showToast({
+          //     title: "已保存至相册",
+          //     icon: "none"
+          //   });
+          // }
         }
         self.markers = markers;
         self.$apply();

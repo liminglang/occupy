@@ -1,35 +1,130 @@
-<style lang="less">
-  .startbutton {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .text {
-    display: inline-block;
-    text-decoration:underline;
+<template>
+  <view class='container'>
+    <ecCanvas id='mychart-dom-area' :canvasId.sync='canvasId' :ec.sync='ec'></ecCanvas>
+  </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import EcCanvas from '../ec-canvas/ec-canvas';
+    import * as echarts from '../ec-canvas/echarts.min';
+    import geoJson from '../static/data/china.js';
+    export default class PieChartPage extends wepy.page {
+      config = {
+          navigationBarTitleText: '我的足迹'
+      };
+      components = {
+          ecCanvas: EcCanvas
+      };
+      data = {
+          canvasId: 'myMap',
+          ec: {
+              onInit: this.initChart
+          },
+          pointData:[
+            {name:'海门',value:[121.15, 31.89, 9]},
+            {name:'大庆',value:[125.03, 46.58, 279]}
+          ]
+      };
+      onLoad() {
+          console.log('heheheeheh');
+      }
+      initChart(canvas, width, height) {
+        let pointData=[
+            {name:'海门',value:[121.15, 31.89, 9]},
+            {name:'大庆',value:[125.03, 46.58, 279]}
+          ]
+        const chart = echarts.init(canvas, null, {
+            width: width,
+            height: height
+        });
+        canvas.setChart(chart);
+        echarts.registerMap('henan', geoJson);
+        const option = {
+          tooltip: {
+            trigger: 'item'
+          },
+
+          toolbox: {
+            show: true,
+            orient: 'vertical',
+            left: 'right',
+            top: 'center',
+            feature: {
+              dataView: { readOnly: false },
+              restore: {},
+              saveAsImage: {}
+            }
+          },
+          series: [{
+            type: 'map',
+            mapType: 'henan',
+            label: {
+              normal: {
+                show: true
+              },
+              emphasis: {
+                textStyle: {
+                  color: '#fff'
+                }
+              }
+            },
+            itemStyle: {
+
+              normal: {
+                borderColor: '#389BB7',
+                areaColor: '#fff',
+              },
+              emphasis: {
+                areaColor: '#389BB7',
+                borderWidth: 0
+              }
+            },
+            animation: false
+          },
+          {
+            name: 'pm2.5',
+            type: 'scatter',
+            coordinateSystem: 'bmap',
+            data: [{name:'海门',value:[121.15, 31.89, 9]},{name:'大庆',value:[125.03, 46.58, 279]}],
+            label: {
+                normal: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                emphasis: {
+                    show: true
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#ddb926'
+                }
+            }
+        },
+          ],
+
+        };
+        console.log(pointData)
+        chart.setOption(option);
+        return chart;
+        }
+    }
+</script>
+
+<style>
+  .container{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    box-sizing:border-box;
+
   }
 </style>
-<template>
-  <view class="weui-cell">
-    <view class="weui-cell__bd">
-      <view class="text">占领宣言</view>
-      <textarea class="weui-textarea-input"/>
-    </view>
-</view>
-</template>
-<script>
-  import wepy from 'wepy'
-  export default class Trace extends wepy.page {
-    config = {
-      navigationBarTitleText: '足迹占领'
-    } 
-    async onLoad(e) {
-      console.log(this.$parent.globalData.user.name)
-    }
-    methods = {
-      startGame() {
-        wx.navigateTo({url: '/pages/index'})
-      }
-    }
-  }
-</script>
