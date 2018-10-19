@@ -16,6 +16,7 @@
     import wepy from 'wepy';
     import { baseUrl, appId} from '@/config'
     import req from '@/network'
+    import _ from 'underscore'
     import EcCanvas from '../ec-canvas/ec-canvas';
     import * as echarts from '../ec-canvas/echarts.min';
     import geoJson from '../static/data/china.js';
@@ -36,60 +37,15 @@
       };
       
       onLoad() {
-        this.userId = this.$parent.globalData.user.id;
-        let cxt_arc = wx.createCanvasContext('canvasArc');//创建并返回绘图上下文context对象。
-        const width = wepy.getSystemInfoSync().windowWidth;
-        cxt_arc.setLineWidth(6);//绘线的宽度
-        cxt_arc.setStrokeStyle('#d2d2d2');//绘线的颜色
-        cxt_arc.setLineCap('round');//线条端点样式
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width/2, 53, 45, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
-        cxt_arc.closePath()
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width/2-95, 53, 40, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
-        cxt_arc.closePath()
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width/2+95, 53, 40, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
-        cxt_arc.closePath()
-        cxt_arc.stroke();//对当前路径进行描边
-        //cxt_arc.stroke();//对当前路径进行描边
-        //这部分是蓝色部分
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.setLineWidth(6);
-        cxt_arc.setStrokeStyle('#3ea6ff');
-        cxt_arc.setLineCap('round')
-        cxt_arc.arc(width/2, 53, 45, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width/2-95, 53, 40, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width/2+95, 53, 40, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.draw()
         this.$apply();
       }
       async initChart(canvas, width, height,userId) {
         let self = this
         var mapFeatures = geoJson.features;
         let geoCoordMap = []
-        // mapFeatures.forEach(function(v) {
-        //   geoCoordMap.push({
-        //     id :v.id,
-        //     // 地区经纬度
-        //     value: v.properties.cp
-        //   })
-        //   // 地区名称
-          
-
-        // });
         let url = baseUrl + `/trace/getMyTraces?userId=${userId}`;
         const traces = await req.get(url).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
-        // this.geoCoordMap = geoCoordMap
-        // this.$apply();
         console.log(traces,"****************");
         if (traces.data) {
           let data = traces.data.data;
@@ -100,7 +56,6 @@
             geoCoordMap.push(marker);
           }
         }
-        console.log(geoCoordMap)
         const chart = echarts.init(canvas, null, {
             width: width,
             height: height
@@ -199,60 +154,62 @@
                 }
             }
           }
-          // {
-          //   type: 'map',
-          //   map: 'china',
-          //   geoIndex: 0,
-          //   aspectScale: 0.75, //长宽比
-          //   showLegendSymbol: false, // 存在legend时显示
-          //   label: {
-          //       normal: {
-          //           show: true
-          //       },
-          //       emphasis: {
-          //           show: false,
-          //           textStyle: {
-          //               color: '#fff'
-          //           }
-          //       }
-          //   },
-          //   roam: true,
-          //   itemStyle: {
-          //       normal: {
-          //           areaColor: '#031525',
-          //           borderColor: '#3B5077',
-          //       },
-          //       emphasis: {
-          //           areaColor: '#2B91B7'
-          //       }
-          //   },
-          //   animation: false,
-          //   data: data
-          // }
-        //   {
-        //     name: 'pm2.5',
-        //     type: 'scatter',
-        //     coordinateSystem: 'bmap',
-        //     data: [{name:'海门',value:[121.15, 31.89, 9]},{name:'大庆',value:[125.03, 46.58, 279]}],
-        //     label: {
-        //         normal: {
-        //             formatter: '{b}',
-        //             position: 'right',
-        //             show: false
-        //         },
-        //         emphasis: {
-        //             show: true
-        //         }
-        //     },
-        //     itemStyle: {
-        //         normal: {
-        //             color: '#ddb926'
-        //         }
-        //     }
-        // },
           ],
 
         };
+        let cxt_arc = wx.createCanvasContext('canvasArc');//创建并返回绘图上下文context对象。
+        let cityCount =  _.size(_.groupBy(traces.data.data,function(obj){return obj.city}));
+        let provinceCount =  _.size(_.groupBy(traces.data.data,function(obj){return obj.province}));
+        console.log(cityCount,provinceCount)
+        const width1 = wepy.getSystemInfoSync().windowWidth;
+        cxt_arc.setLineWidth(6);//绘线的宽度
+        cxt_arc.setStrokeStyle('#d2d2d2');//绘线的颜色
+        cxt_arc.setLineCap('round');//线条端点样式
+        cxt_arc.beginPath();//开始一个新的路径
+        cxt_arc.arc(width1/2, 53, 45, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
+        cxt_arc.setFontSize(14)
+        cxt_arc.fillText('超过了', width1/2-20, 35);
+        cxt_arc.fillText('的小伙伴', width1/2-27, 75);
+        cxt_arc.setFontSize(20)
+        cxt_arc.setFillStyle('red')
+        cxt_arc.fillText('80%', width1/2-20, 55);
+        cxt_arc.closePath()
+        cxt_arc.stroke();//对当前路径进行描边
+        cxt_arc.beginPath();//开始一个新的路径
+        cxt_arc.arc(width1/2-95, 53, 40, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
+        cxt_arc.setFontSize(14)
+        cxt_arc.setFillStyle('black')
+        cxt_arc.fillText('省份', width1/2-95-15, 40);
+        cxt_arc.setFontSize(20)
+        cxt_arc.setFillStyle('red')
+        cxt_arc.fillText(String(provinceCount), width1/2-95-15, 66);
+        cxt_arc.closePath()
+        cxt_arc.stroke();//对当前路径进行描边
+        cxt_arc.beginPath();//开始一个新的路径
+        cxt_arc.arc(width1/2+95, 53, 40, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
+        cxt_arc.setFontSize(14)
+        cxt_arc.setFillStyle('black')
+        cxt_arc.fillText('城市', width1/2+95-15, 40);
+        cxt_arc.setFontSize(20)
+        cxt_arc.setFillStyle('red')
+        cxt_arc.fillText(String(cityCount), width1/2+95-15, 66);
+        cxt_arc.closePath()
+        cxt_arc.stroke();//对当前路径进行描边
+        //cxt_arc.stroke();//对当前路径进行描边
+        //这部分是蓝色部分
+        cxt_arc.beginPath();//开始一个新的路径
+        cxt_arc.setLineWidth(6);
+        cxt_arc.setStrokeStyle('#3ea6ff');
+        cxt_arc.setLineCap('round')
+        cxt_arc.arc(width1/2, 53, 45, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
+        cxt_arc.stroke();//对当前路径进行描边
+        cxt_arc.beginPath();//开始一个新的路径
+        cxt_arc.arc(width1/2-95, 53, 40, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
+        cxt_arc.stroke();//对当前路径进行描边
+        cxt_arc.beginPath();//开始一个新的路径
+        cxt_arc.arc(width1/2+95, 53, 40, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
+        cxt_arc.stroke();//对当前路径进行描边
+        cxt_arc.draw()
         chart.setOption(option);
         return chart;
         }
