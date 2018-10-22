@@ -97,6 +97,21 @@
           </view>
         </view>
       </view>
+      <view>隐藏足迹</view>
+      <repeat for="{{list}}" key="index" index="index" item="item">
+        <view class="weui-cell">
+          <block wx:if='{{item.isshow}}'>
+            <view class='content'>{{item.dateString}},{{item.city}},{{item.scenic}}
+              <button class='button' @tap='hideTrace({{index}})'>隐藏</button>
+            </view>
+          </block>
+          <block wx:else>
+            <view class='content' style='color:#C0C0C0'>{{item.dateString}},{{item.city}},{{item.scenic}}
+              <button class='button' @tap='hideTrace({{index}})'>显示</button>
+            </view>
+          </block>
+        </view>
+      </repeat>
     </view>   
   </view>
 </template>
@@ -117,7 +132,9 @@
       longitude:'',
       province:'',
       scenic:'',
-      city:''
+      city:'',
+      list:[],
+      buttonContent:''
     }
     bindDateChange(e) {
       this.date = e.detail.value;
@@ -131,7 +148,22 @@
         this.city = e.city;
         this.$apply();
       }
+      let url = baseUrl + `/trace/getMyTraces?userId=${this.$parent.globalData.user.id}`;
+      const traces = await req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      if (traces.data) {
+        this.list = traces.data.data;
+        for(let i=0;i<this.list.length;i++){
+          let date  = new Date(this.list[i].created*1000);
+          let year = date.getFullYear();
+          let month = date.getMonth()+1;
+          let day = date.getDate();
+          this.list[i]['dateString'] = year + '.' + month + '.' + day;
+        }
+        this.$apply();
+      }
     }
+
     methods = {     
       searchLocation(){
         wepy.navigateTo({url:`/pages/selectlocation`})
@@ -225,6 +257,19 @@
         this.imgbox = [];
         this.scenic = '';
         this.date = '';
+        this.$apply();
+      },
+      async hideTrace(index,id,isshow){
+        console.log(this.list[index])
+        let url = baseUrl + `/trace/updateTrace?id=${this.list[index].id}`
+        if(this.list[index].isshow){
+          this.list[index].isshow = 0;
+        }else{
+          this.list[index].isshow = 1;
+        }
+        const setData = {'isshow': this.list[index].isshow}
+        await req.post(url, setData).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})
         this.$apply();
       }
     }
