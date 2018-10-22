@@ -12,7 +12,7 @@
       <button class='button' @tap="searchLocation">搜索</button>
     </view>
     <repeat for="{{list}}" key="index" index="index" item="item">
-      <navigator url="/pages/edittrace?latitude={{item.location.lat}}&longitude={{item.location.lng}}&scenic={{item.title}}&province={{item.province}}&city={{item.city}}">
+      <navigator open-type='redirect' url="/pages/edittrace?latitude={{item.location.lat}}&longitude={{item.location.lng}}&scenic={{item.title}}&province={{item.province}}&city={{item.city}}">
         <view class="weui-cell">
           <view class='content'>{{item.title}}</view>
           <view class='declaration'>{{item.address}}</view>

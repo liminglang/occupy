@@ -95,20 +95,20 @@
               <view class='add-pic'>
                 <image class='add-pic' src='{{item}}'></image>
                   <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
-                    <image class='gps' src='/static/images/close_pic.png'></image>
+                    <image class='gps' src='/static/images/close_pic.jpg'></image>
                   </view>
               </view>
             </view>
           </block>
           <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
-            <image class='gps' src='/static/images/add_pic.png'></image>
+            <image class='gps' src='/static/images/add_pic.jpg'></image>
           </view>
         </view>
       </view>
       <view class="weui-cell">
         <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
           <view class="weui-cell__hd">
-            <image class="gps" src="/static/images/address.png"></image>
+            <image class="gps" src="/static/images/address.jpg"></image>
           </view>
           <view class="weui-cell__bd">{{city}},{{locationName}}</view>
           <view class="weui-cell__ft weui-cell__ft_in-access"></view>
@@ -133,7 +133,7 @@
       locationName:'',
       longitude:'',
       latitude:'',
-      imageUrl:'/static/images/ic_menu_topic_nor.png',
+    //  imageUrl:'/static/images/ic_menu_topic_nor.jpg',
       imgbox:[]
     }
     async onLoad(e) {
@@ -162,7 +162,11 @@
       console.log(res.data.result);
       this.city = res.data.result.ad_info.city;
       if(!this.locationName) {
-        this.locationName = res.data.result.address_reference.famous_area.title;
+        if(res.data.result.address_reference.famous_area){
+          this.locationName = res.data.result.address_reference.famous_area.title;
+        }else{
+          this.locationName = res.data.result.address_reference.landmark_l2.title;
+        }
       } 
     }
 

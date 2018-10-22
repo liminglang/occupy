@@ -87,13 +87,13 @@
               <view class='add-pic'>
                 <image class='add-pic' src='{{item}}'></image>
                   <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
-                    <image class='gps' src='/static/images/close_pic.png'></image>
+                    <image class='gps' src='/static/images/close_pic.jpg'></image>
                   </view>
               </view>
             </view>
           </block>
           <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
-            <image class='gps' src='/static/images/add_pic.png'></image>
+            <image class='gps' src='/static/images/add_pic.jpg'></image>
           </view>
         </view>
       </view>

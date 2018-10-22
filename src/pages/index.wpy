@@ -41,7 +41,6 @@
     }
     
     async onLoad(e) {
-      console.log("onload=======================")
       await this.$parent.login(e);
       this.height = wepy.getSystemInfoSync().windowHeight
       const location = await wepy.getLocation({
@@ -56,7 +55,6 @@
       //根据经纬度和userid去trace表中查找，当前位置我是否已经占领了，如果占领了，就显示头像，否则显示占领按钮
       let self = this;
       if(this.isDisplay){
-        console.log("1111111111111")
         await this.getTraces()
       }
       this.isLoaded = true
@@ -71,7 +69,7 @@
       latitude: 0,
       longitude: 0,
       markers:[{    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-        iconPath: '/static/images/occupy.png',
+        iconPath: '/static/images/occupy.jpg',
         id: 0,
         name: '卧槽',
         latitude: '',
@@ -115,14 +113,6 @@
       let self = this;
       if(e.type == 'end'){
         if(this.isDisplay&&this.isLoaded){
-          console.log("2222222222",this.latitude,this.longitude)
-          // setTimeout(() => {
-          //   self.getTraces()
-          // }, 500);
-          // setTimeout(() =>{
-          //   self.drawAvatar(self.markers)
-          // },1000);
-         // await this.getTraces();
         }
       }      
       this.$apply();
@@ -188,7 +178,7 @@
       if(!result.data.data.isOccupied){
           this.markers.push(
           {    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-            iconPath: "/static/images/occupy.png",
+            iconPath: "/static/images/occupy.jpg",
             id: 0,
             latitude: this.latitude,
             longitude: this.longitude,
