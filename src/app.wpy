@@ -32,6 +32,8 @@ export default class extends wepy.app {
       'pages/traceshow',
       'pages/post',
       'pages/tracelist',
+      'pages/edittrace',
+      'pages/selectlocation'
     ],
     tabBar: {
       color: '#666',

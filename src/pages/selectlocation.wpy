@@ -1,0 +1,63 @@
+<style lang="less">
+  .startbutton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+<template>
+  <view>
+    <view>
+      <input class="weui-input" placeholder="输入关键词" value="{{location}}" bindblur='setKey'/>
+      <button class='button' @tap="searchLocation">搜索</button>
+    </view>
+    <repeat for="{{list}}" key="index" index="index" item="item">
+      <navigator url="/pages/edittrace?latitude={{item.location.lat}}&longitude={{item.location.lng}}&scenic={{item.title}}&province={{item.province}}&city={{item.city}}">
+        <view class="weui-cell">
+          <view class='content'>{{item.title}}</view>
+          <view class='declaration'>{{item.address}}</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+        </view>
+      </navigator>
+    </repeat>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import qqmapwx from '../map/qqmap-wx-jssdk.js'
+  export default class Ablum extends wepy.page {
+    config = {
+      navigationBarTitleText: '选择地点'
+    }
+    data = {
+      list:[],
+      locationKey:''
+    }
+    async onLoad(e) {
+      console.log(e.locationKey)
+      //await this.searchLocation(e.locationKey)
+    }
+    setKey(e){
+      this.locationKey = e.detail.value;
+      this.$apply();
+    }
+    methods = {
+      searchLocation(){    
+        let qqmapsdk = new qqmapwx({
+          key: 'AH3BZ-VOTAI-UWTGW-5A6XQ-NBKK2-UOFLE'
+        });
+        var self = this;
+        // 调用接口
+        qqmapsdk.getSuggestion({
+          keyword: self.locationKey,  //搜索关键词
+          success(res) { //搜索成功后的回调
+      
+            console.log("res*****************",res.data)
+            self.list = res.data;
+            self.$apply();
+          }
+        });
+      }
+    }
+  }
+</script>

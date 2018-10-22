@@ -1,0 +1,232 @@
+<style lang="less">
+  .startbutton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .button {
+    display:inline;
+    background-color: #44dd15;
+    margin-left: 200px;
+  }
+  .content {
+    flex: 1;
+    margin-left: 10px;
+    text-overflow:ellipsis;
+  }
+  .gps {
+    height: 30px;
+    width: 30px;
+  }
+  .up-pic {
+    width: 100%;
+    justify-content: center;
+  }
+  .pic-box{  
+    margin-top:20rpx;  
+    flex-flow:wrap;  
+    width:95%;   
+  } 
+  .ap-box{  
+    position: relative;  
+  }
+  .add-pic{  
+    width: 160rpx;  
+    height: 160rpx;  
+    margin-right: 20rpx;  
+    position: relative;  
+    margin: 20rpx 30rpx 20rpx 30rpx;  
+  } 
+  .img-de{  
+    width:45rpx;  
+    height:45rpx;  
+    border-radius:50%;  
+    position:absolute;  
+    right:-41rpx;  
+    top:5rpx;  
+  }
+</style>
+<template>
+  <view>
+    <view>
+      <view>新增足迹<button class='button' @tap="confirm">完成</button>
+      </view>
+      <!-- <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label">省 市 区:</view>
+        </view>
+        <view class="weui-cell__bd">
+          <picker mode="region" bindchange="bindRegionChange" value="{{region}}" custom-item="{{customItem}}">
+            <view class="weui-input">{{region}}</view>
+          </picker>
+        </view>
+      </view> -->
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label">地点名称：</view>
+        </view>
+        <view class="weui-cell__bd">
+          <view class="weui-input" @tap='searchLocation'>{{scenic}}</view>
+          <!-- <input class="weui-input" value="{{scenic}}" bindfocus='searchLocation'/> -->
+        </view>
+      </view>
+      <view class="weui-cell weui-cell_input">
+        <view class="weui-cell__hd">
+          <view class="weui-label">游玩日期:</view>
+        </view>
+        <view class="weui-cell__bd">
+          <picker mode="date" bindchange="bindDateChange" value="{{date}}">
+            <view class="weui-input" placeholder="选择到哪的时间">{{date}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class='up-pic'>
+        <view class='flex pic-box'>
+          <block wx:key="imgbox" wx:for="{{imgbox}}">
+            <view class='ap-box'>
+              <view class='add-pic'>
+                <image class='add-pic' src='{{item}}'></image>
+                  <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
+                    <image class='gps' src='/static/images/close_pic.png'></image>
+                  </view>
+              </view>
+            </view>
+          </block>
+          <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
+            <image class='gps' src='/static/images/add_pic.png'></image>
+          </view>
+        </view>
+      </view>
+    </view>   
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  import { baseUrl, appId} from '@/config'
+  import req from '@/network'
+  import qqmapwx from '../map/qqmap-wx-jssdk.js'
+  export default class Edittrace extends wepy.page {
+    config = {
+      navigationBarTitleText: '足迹占领'
+    }
+    data = {
+      date:'',
+      imgbox:[],
+      latitude:'',
+      longitude:'',
+      province:'',
+      scenic:'',
+      city:''
+    }
+    bindDateChange(e) {
+      this.date = e.detail.value;
+    }
+    async onLoad(e) {
+      if(e.latitude){
+        this.latitude = e.latitude;
+        this.longitude = e.longitude;
+        this.scenic = e.scenic;
+        this.province = e.province;
+        this.city = e.city;
+        this.$apply();
+      }
+    }
+    methods = {     
+      searchLocation(){
+        wepy.navigateTo({url:`/pages/selectlocation`})
+      },
+      async uploadPhoto(e){
+        let self = this;
+        wx.showActionSheet({
+          itemList: ['从相册中选择', '拍照'],
+          success: async (res)=> {
+            if (!res.cancel) {
+              var imgbox = self.imgbox;
+              console.log(imgbox)
+              var picid = e.currentTarget.dataset.pic;
+              console.log(picid)
+              var that = this;
+              var n = 9;
+              if (9 > imgbox.length > 0) {
+                n = 9 - imgbox.length;
+              } else if (imgbox.length == 9) {
+                n = 1;
+              }
+              const res = await wepy.chooseImage({
+                count: n,
+                sizeType: ['original', 'compressed'],
+                sourceType: ['album', 'camera']
+              })
+              if (imgbox.length == 0) {
+                imgbox = res.tempFilePaths
+              } else if (9 > imgbox.length) {
+                imgbox = imgbox.concat(res.tempFilePaths);
+              } else {
+                imgbox[picid] = res.tempFilePaths[0];
+              }
+              self.imgbox = imgbox;
+              self.$apply();
+            }
+          }
+        })
+        this.$apply();
+      },
+      
+      imgDelete(e){
+        let index = e.currentTarget.dataset.deindex;
+        this.imgbox.splice(index, 1);
+        this.$apply();
+      },
+
+      async confirm(e) {
+        const userInfo = e.detail.userInfo;
+        console.log(userInfo)
+        if (userInfo) {
+          if (!this.$parent.globalData.userInfo) {
+            const setting = await wepy.getSetting()
+            if (setting.authSetting['scope.userInfo']) {
+              const info = await wepy.getUserInfo()
+              this.$parent.globalData.userInfo = info.userInfo
+              let url = baseUrl + '/auth/updateUser'
+              const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': info.userInfo.avatarUrl, 'gender': info.userInfo.gender}
+              await req.post(url, setData).catch((err)=>{
+                console.log("updateAvatarError...", err.data)})
+              this.$parent.globalData.user.name = info.userInfo.nickName;
+              this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
+            }
+          }         
+        }
+        
+        let url = baseUrl + '/trace/addTrace';
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city}
+        const result = await req.post(url, setData).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})
+        if(result.data.data.traceId){
+          let self = this;
+          let imgurl = baseUrl + `/image/save`
+          for(var i = 0; i<this.imgbox.length ; i++){
+            (function(i){
+              wx.uploadFile({
+                url: baseUrl + `/image/save?traceId=${result.data.data.traceId}`,
+                filePath: self.imgbox[i],
+                name: 'image',
+                formData:{'number':i},
+                header: {
+                  'content-type':'multipart/form-data'
+              },
+                success(res){
+                  console.log(res)
+                }
+              })
+            })(i)
+          }   
+        }
+        this.imgbox = [];
+        this.scenic = '';
+        this.date = '';
+        this.$apply();
+      }
+    }
+  }
+</script>

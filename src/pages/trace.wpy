@@ -8,6 +8,7 @@
           <view class="centerWord">{{resultComment}}</view>
         </view>
       </view>
+      <button class='button' @tap="editTrace">编辑我的足迹</button>
     </view>
   </view>
 </template>
@@ -30,7 +31,6 @@
       data = {
           canvasId: 'myMap',
           ec: {
-              userId:this.userId,
               onInit: this.initChart
           },
           geoCoordMap:[],
@@ -63,13 +63,6 @@
         canvas.setChart(chart);
         echarts.registerMap('china', geoJson);
         const option = {
-          title: {
-            text: '我的足迹',
-            left: 'center',
-            textStyle: {
-                color: '#044161'
-            }
-          },
           tooltip: {
             trigger: 'item'
           },
@@ -213,6 +206,11 @@
         chart.setOption(option);
         return chart;
         }
+      methods = {
+        editTrace(){
+          wx.navigateTo({url: 'edittrace'})
+        }
+      }
     }
 </script>
 
@@ -245,7 +243,11 @@
   .top {
     text-align: center;
   }
-  
+  .button{
+    position: fixed;
+    top: 0;
+    left: 10px;
+  }
   .centerWord {
     width: 100%;
     position: absolute;
