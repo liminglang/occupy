@@ -89,10 +89,10 @@
         <view class='content'>{{name}}</view>
         <view class='content'>
           <view class='declaration'>{{declaration}}</view>
-          <image class="heart" mode="aspectFit" src="/static/images/heart.png" @tap='changeParisecount({{id}})'></image>
+          <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{id}})'></image>
           <view style='display:inline-block;margin-left:5px;'>{{parisecount}}</view>
         </view>
-        <image class="gps" src="/static/images/address.png"></image>
+        <image class="gps" src="/static/images/address.jpg"></image>
         <view class='location'>{{scenic}}</view>
         <view class='text'>第{{number}}个占领者</view>
       </view>
@@ -116,6 +116,7 @@
           <button class="button" open-type="share">分享给好友</button>
         </block>
       </view>
+      <button class="button" @tap="goBack">回到首页</button>
     </view>
 </template>
 <script>
@@ -189,7 +190,10 @@
 
     methods = {
       getPost() {
-        wx.navigateTo({url: `/pages/post?content=${this.content}&dateString=${this.dateString}&locationName=${this.scenic}`})
+        wx.navigateTo({url: `/pages/post?traceId=${this.id}&declaration=${this.declaration}&dateString=${this.dateString}&locationName=${this.scenic}`})
+      },
+      goBack() {
+        wx.switchTab({url:'/pages/index'})
       },
       async changeParisecount(traceId){
         if(this.isParised){

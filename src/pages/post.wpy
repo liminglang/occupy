@@ -68,25 +68,28 @@
       navigationBarTitleText: '足迹占领'
     } 
     data = {
-      content:'',
+      declaration:'',
       locationName:'',
       nickName: '',
       avatar:'',
       dateString:'',
       imageUrl:'',
+      imgbox:[],
       canvasHeight:100
     }
     async onLoad(e) {
+      console.log("e=================",e)
       this.nickName = this.$parent.globalData.user.name;
       this.avatar = this.$parent.globalData.user.avatar;
       this.locationName = e.locationName;
-      this.content = e.content;
+      this.declaration = e.declaration;
       this.dateString = e.dateString;
       const self = this
       const ctx = wepy.createCanvasContext('myCanvas');
       const width = wepy.getSystemInfoSync().windowWidth;
       const height = wepy.getSystemInfoSync().windowHeight-50;
       this.canvasHeight = height;
+      await this.getImages(e.traceId);
       console.log("canvasHeight===========",this.canvasHeight)
       this.$apply();
       ctx.rect(5,5,width-10,height-10)
@@ -94,14 +97,14 @@
     //   //const radius = width * 105/430
       ctx.setFontSize(14);
       ctx.fillText(this.nickName,105,35);
-      ctx.fillText(this.content,90,65);
+      ctx.fillText(this.declaration,90,65);
       ctx.fillText(this.dateString,15, height-80);
       ctx.fillText(this.locationName,30, height-40);
       ctx.save();
       ctx.restore();
       ctx.beginPath()
-      ctx.drawImage("/static/images/test.jpg",5, 85, width-10, height-180);
-      ctx.drawImage("/static/images/address.png",10, height-55, 13, 20);
+      ctx.drawImage(this.imgbox[0],5, 85, width-10, height-180);
+      ctx.drawImage("/static/images/address.jpg",10, height-55, 13, 20);
       ctx.stroke()
       
       ctx.save();
@@ -127,6 +130,16 @@
         self.imageUrl = res.tempFilePath;
         self.$apply();
       })
+    }
+    async getImages(traceId){
+      let url = baseUrl + `/image/get?traceId=${traceId}`;
+      const result = await req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      if(result.data.data.imageCount){
+        for(var i=0;i<result.data.data.imageCount;i++){
+          this.imgbox.push(baseUrl+"/static/image/"+traceId+'/'+result.data.data.images[i]) 
+        }
+      }
     }
 
     methods = {

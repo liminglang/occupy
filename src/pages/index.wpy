@@ -15,9 +15,10 @@
 </style>
 <template>
   <view>
-    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location ></map>
-    <button class='button' @tap="disPlay">{{buttonContent}}</button>
-    <canvas canvas-id="myCanvas" style='height:300px;width:150px;'/>
+    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location></map>
+    <!-- <button class='button' @tap="disPlay">{{buttonContent}}</button> -->
+    <canvas canvas-id="myCanvas" style='height:300px;width:150px;margin-top:-10000px'/>
+    <!-- <button style='top:{{height/2}}px;left:{{width/2-30}}px;position:absolute;background-color: #44dd15;height:30px;font-size:12px;' @tap="occupy">占领</button> -->
     <!-- <button type="primary" @tap="getCenterLocation">获取位置</button>
     <canvas canvas-id="myCanvas" style='height:300px;width:150px;s'/>
     <image  src="{{imageUrl}}"></image>
@@ -43,6 +44,7 @@
     async onLoad(e) {
       await this.$parent.login(e);
       this.height = wepy.getSystemInfoSync().windowHeight
+      this.width = wepy.getSystemInfoSync().windowWidth
       const location = await wepy.getLocation({
           type: 'gcj02'
         });
@@ -50,36 +52,124 @@
       this.longitude = location.longitude;
       this.mapCtx = wx.createMapContext('map'); 
       this.mapCtx.moveToLocation();
+     // this.getCenterLocation();
+      //this.getRegion()
       this.$apply()
       console.log(this.latitude,this.longitude)
       //根据经纬度和userid去trace表中查找，当前位置我是否已经占领了，如果占领了，就显示头像，否则显示占领按钮
-      let self = this;
+     // let self = this;
+     // await this.getTraces()
       if(this.isDisplay){
+        console.log("isDisplay============================",this.isDisplay)
         await this.getTraces()
       }
-      this.isLoaded = true
-      this.$apply();
+     this.isOnload = true
+     this.$apply();
+    }
+    async onShow() {
+      //this.onLoad()
     }
 
     data = {
       isOccupied:true,
-      imageUrl:'',
-      height:1000,
+      height:wepy.getSystemInfoSync().windowHeight,
+      width:wepy.getSystemInfoSync().windowWidth,
       scale:16,
       latitude: 0,
       longitude: 0,
-      markers:[{    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-        iconPath: '/static/images/occupy.jpg',
-        id: 0,
-        name: '卧槽',
-        latitude: '',
-        longitude: '',
-        width: 30,
-        height: 30,
-        traceIds: [],
-        avatars: []
-      }],
-      controls: [{
+      // markers:[{    //markers的第一个数据永远是当前位置，其他的数据来自trace表
+      //   iconPath: '/static/images/occupy.jpg',
+      //   id: 0,
+      //   name: '卧槽',
+      //   latitude: '',
+      //   longitude: '',
+      //   width: 30,
+      //   height: 30,
+      //   traceIds: [],
+      //   avatars: []
+      // }],
+      markers: [],
+      controls: [],
+      range_x: 0,
+      range_y: 0,
+      isDisplay:true,
+      isOnload:false,
+      buttonContent:'不显示占领者'
+    }
+    async updated(e) {
+      console.log(e.type)
+      let self = this;
+      if(e.type == 'end'){
+        if(this.isDisplay&&this.isOnload){
+          console.log("22222211111111111111111")
+          this.getTraces();
+        }
+      }      
+      this.$apply();
+    }
+    markertap(e) {
+      if(this.markers[e.markerId].traceIds.length==1){
+        wx.navigateTo({url: `/pages/traceshow?traceId=${this.markers[e.markerId].traceIds[0]}`})
+      }else{
+        wx.navigateTo({url: `/pages/tracelist?latitude=${this.markers[e.markerId].latitude}&longitude=${this.markers[e.markerId].longitude}&scenic=${this.markers[e.markerId].name}`})
+      }
+    }
+    async controltap(e) {
+      console.log(e.controlId)
+      if(e.controlId == 1){
+        this.scale = this.scale + 1;
+        await this.getTraces();
+      }else if(e.controlId ==2){
+        this.scale = this.scale - 1;
+        await this.getTraces();
+      }else if(e.controlId==3){
+        console.log("controltap=====",this.latitude,this.longitude)
+        wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
+      }else{
+        if(this.isDisplay){
+          this.isDisplay = false;
+        }else{
+          this.isDisplay = true;
+        }
+        this.$apply();
+        this.initMarkers();
+        this.onLoad();
+      }
+      
+      // let self = this;
+      // if(this.isDisplay){
+      //   // 
+      //   console.log("33333333333333333")
+      //   await this.getTraces();
+      // }
+      //this.$apply();
+    }
+    async getCenterLocation(){
+      let self = this;
+      const res = await wepy.getLocation({
+        type: 'gcj02'
+      });
+      // self.latitude = res.latitude;
+      // self.longitude = res.longitude;
+      // //self.mapCtx.moveToLocation();
+      // self.$apply();
+      console.log(this.latitude,this.longitude,"************************")
+    }
+    async getRegion(){
+      let self = this;
+      await this.mapCtx.getRegion({
+        success: function(res){
+          self.range_x = res.northeast.latitude;
+          self.range_y = res.northeast.longitude;
+          console.log("getregion-----",self.range_x,self.range_y)
+          self.$apply();
+        }
+      });
+      console.log("region======",this.range_x,this.range_y)
+    }
+    async initMarkers(){
+      this.markers = []
+      this.controls = [{
         id: 1,
         iconPath: '/static/images/jia.jpg',
         position: {
@@ -100,146 +190,100 @@
         height: 30
         },
         clickable: true
+      },
+      {
+        id: 4,
+        iconPath: '/static/images/occupy.jpg',
+        position: {
+        left: 0,
+        top: 0,
+        width: 50,
+        height: 30
+        },
+        clickable: true
       }
-      ],
-      range_x: 0,
-      range_y: 0,
-      isDisplay:true,
-      isLoaded:false,
-      buttonContent:'不显示占领者'
-    }
-    async updated(e) {
-      console.log(e.type)
-      let self = this;
-      if(e.type == 'end'){
-        if(this.isDisplay&&this.isLoaded){
-        }
-      }      
-      this.$apply();
-    }
-    markertap(e) {
-      console.log(666666666666666);
-      if(e.markerId!=0){
-        if(this.markers[e.markerId].traceIds.length==1){
-          wx.navigateTo({url: `/pages/traceshow?traceId=${this.markers[e.markerId].traceIds[0]}`})
-        }else{
-          wx.navigateTo({url: `/pages/tracelist?latitude=${this.markers[e.markerId].latitude}&longitude=${this.markers[e.markerId].longitude}&scenic=${this.markers[e.markerId].name}`})
-        }
-      }else if(this.isOccupied){
-        if(this.markers[e.markerId].traceIds.length==1){
-          wx.navigateTo({url: `/pages/traceshow?traceId=${this.markers[e.markerId].traceIds[0]}`})
-        }else{
-          wx.navigateTo({url: `/pages/tracelist?latitude=${this.markers[e.markerId].latitude}&longitude=${this.markers[e.markerId].longitude}&scenic=${this.markers[e.markerId].name}`})
-        }       
-      }else{
-         wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
-      }
-    }
-    async controltap(e) {
-      console.log(e.controlId)
-      if(e.controlId == 1){
-        this.scale = this.scale + 1;
-      }else{
-        this.scale = this.scale - 1;
-      }
-      let self = this;
-      if(this.isDisplay){
-        // 
-        console.log("33333333333333333")
-        await this.getTraces();
-      }
-      this.$apply();
-    }
-    async getCenterLocation(){
-      let self = this;
-      const location = await wepy.getLocation({
-          type: 'gcj02'
-        });
-      this.latitude = location.latitude;
-      this.longitude = location.longitude;
-    }
-    async getRegion(){
-      let self = this;
-      await this.mapCtx.getRegion({
-        success: function(res){
-          self.range_x = res.northeast.latitude;
-          self.range_y = res.northeast.longitude;
-          self.$apply();
-          console.log("region======1111",res,self.range_x,self.range_y)
-        }
-      });
-      console.log("region======",this.range_x,this.range_y)
-    }
-    async initMarkers(){
-      this.markers = []
+      ]
       let url = baseUrl + `/trace/isOccupied?latitude=${this.latitude}&longitude=${this.longitude}&userId=${this.$parent.globalData.user.id}`;
       const result = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
-      if(!result.data.data.isOccupied){
-          this.markers.push(
-          {    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-            iconPath: "/static/images/occupy.jpg",
-            id: 0,
-            latitude: this.latitude,
-            longitude: this.longitude,
-            width: 30,
-            height: 30,
-            traceIds: [],
-            avatars:[]          
+      if(result.data.data.userIds){
+          const userIds = _.pluck(result.data.data.userIds,'userId')
+          if(_.indexOf(userIds,this.$parent.globalData.user.id)>-1){
+            this.isOccupied = true;
+          }else{
+            console.log("222222222222222111111111111111111111111")
+            this.isOccupied = false;
+            this.controls.push({
+              id: 3,
+              iconPath: '/static/images/occupy.jpg',
+              position: {
+                left: wepy.getSystemInfoSync().windowWidth/2-15,
+                top: wepy.getSystemInfoSync().windowHeight/2-5,
+                width: 30,
+                height: 30
+              },
+              clickable: true
+            })
           }
-        );
-        this.isOccupied = false;
       }
       this.$apply();
     }
     async getTraces(){
       console.log("this.scale================",this.scale)
-      await this.getCenterLocation();
+      const res = await wepy.getLocation({
+        type: 'gcj02'
+      });
       await this.getRegion();
       this.initMarkers();
       let self = this;
+      console.log("进入settimeout之前latitude========,longitude========",self.latitude,self.longitude)
+      console.log("进入settimeout之前range_x1========,range_y1========",self.range_x,self.range_y)
+      let latitude1,longitude1,range_x1,range_y1;
+      latitude1 = res.latitude
+      longitude1 = res.longitude     
       setTimeout(async () =>{
-          if(self.range_x>=1){
-            self.range_x = self.range_x - self.latitude;
-            self.$apply();
+        if(range_x1>=1){
+          range_x1 = range_x1 - latitude1;
+          //self.$apply();
+        }
+        if(range_y1>=1){ 
+          range_y1 = range_y1 - longitude1;
+         // self.$apply();
+        }
+        console.log("self==========",self)
+        console.log("latitude========,longitude========",latitude1,longitude1)
+        let url = baseUrl + `/trace/getTraces?latitude=${latitude1}&longitude=${longitude1}&range_x=0.25&range_y=0.25`;
+        const traces = await req.get(url).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})
+        if (traces.data) {
+          let data = traces.data.data;
+          let scenices = _.groupBy(data,function(obj){return obj.scenic});
+          console.log("scenices==============",scenices)
+          let k = 0;
+          for(var i in scenices) {
+            let marker = {};
+            marker['id'] = k;
+            marker['latitude'] = scenices[i][0].latitude;
+            marker['longitude'] = scenices[i][0].longitude;
+            marker['width'] = 30;
+            marker['height'] = 30;
+            marker['name'] = i;
+            marker['traceIds'] = _.pluck(scenices[i], 'id');
+            marker['avatars'] = _.pluck(scenices[i], 'avatar');
+            self.markers.push(marker);
+            k = k+1;
           }
-          if(self.range_y>=1){ 
-            self.range_y = self.range_y - self.longitude;
-            self.$apply();
-          }
-          let url = baseUrl + `/trace/getTraces?latitude=${self.latitude}&longitude=${self.longitude}&range_x=${self.range_x}&range_y=${self.range_y}`;
-          const traces = await req.get(url).catch((err)=>{
-            console.log("updateAvatarError...", err.data)})
-          if (traces.data) {
-            let data = traces.data.data;
-            let scenices = _.groupBy(data,function(obj){return obj.scenic});
-            console.log("scenices==============",scenices)
-            let k = 0;
-            for(var i in scenices) {
-              let marker = {};
-              k = k + 1;
-              marker['id'] = k;
-              marker['latitude'] = scenices[i][0].latitude;
-              marker['longitude'] = scenices[i][0].longitude;
-              marker['width'] = 30;
-              marker['height'] = 30;
-              marker['name'] = i;
-              marker['traceIds'] = _.pluck(scenices[i], 'id');
-              marker['avatars'] = _.pluck(scenices[i], 'avatar');
-              self.markers.push(marker);
-            }
-          }
-          setTimeout(async()=>{
-            await self.drawAvatar(this.markers);
-          },200) 
-          self.$apply();
-        },1000);
+        }
+        setTimeout(async()=>{
+          await self.drawAvatar(self.markers);
+        },200) 
+        self.$apply();
+      },1000);
       
         
-      this.$apply();
+     // this.$apply();
     }
     async drawAvatar(markers){
-      console.log("4444444444444",markers)
       let self = this
       const ctx = wepy.createCanvasContext('myCanvas');
       ctx.beginPath()
@@ -271,12 +315,7 @@
             fileType: 'jpeg',
           });
           // if(markers[j].name=='市政府'){
-          self.imageUrl = res.tempFilePath
-          console.log("dodddddddd")
-          if(j!=0 || self.isOccupied){
-            console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-            markers[j]['iconPath'] = res.tempFilePath
-          }
+          markers[j]['iconPath'] = res.tempFilePath
           // const saveRes = await wepy.saveImageToPhotosAlbum({
           //   filePath: res.tempFilePath
           // }).catch((err)=>{
@@ -297,8 +336,8 @@
       this.$apply()
     }
     methods = {
-      startGame() {
-        wx.switchTab({url: '/pages/ablum'})
+      occupy() {
+        wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
       },
       async userLogin(e) {
         const userInfo = e.detail.userInfo;
@@ -321,10 +360,6 @@
             wx.switchTab({url: '/pages/ablum'})
           }          
         }
-      },
-      
-      async getCenterLocation(){
-        await this.getCenterLocation()
       },
 
       disPlay(){

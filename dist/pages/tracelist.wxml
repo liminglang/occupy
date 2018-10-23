@@ -7,10 +7,10 @@
           <view class="content">{{item.name}}</view>
           <view class="content">
             <view class="declaration">{{item.declaration}}</view>
-            <image class="heart" mode="aspectFit" src="/static/images/heart.png" bindtap="changeParisecount" data-wpychangeparisecount-a="{{item.id}}" data-wpychangeparisecount-b="{{index}}"/>
+            <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" bindtap="changeParisecount" data-wpychangeparisecount-a="{{item.id}}" data-wpychangeparisecount-b="{{index}}"/>
             <view style="display:inline-block;margin-left:5px;">{{item.parisecount}}</view>
           </view>
-          <image class="gps" src="/static/images/address.png"/>
+          <image class="gps" src="/static/images/address.jpg"/>
           <view class="location">{{item.scenic}}</view>
           <view class="text">第{{item.number}}个占领者</view>
         </view>

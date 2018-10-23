@@ -133,6 +133,7 @@
       locationName:'',
       longitude:'',
       latitude:'',
+      province:'',
     //  imageUrl:'/static/images/ic_menu_topic_nor.jpg',
       imgbox:[]
     }
@@ -161,6 +162,7 @@
       });
       console.log(res.data.result);
       this.city = res.data.result.ad_info.city;
+      this.province = res.data.result.ad_info.province;
       if(!this.locationName) {
         if(res.data.result.address_reference.famous_area){
           this.locationName = res.data.result.address_reference.famous_area.title;
@@ -238,7 +240,7 @@
         }
         
         let url = baseUrl + '/trace/addTrace';
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content}
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content, 'province':this.province, 'city':this.city}
         const result = await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         if(result.data.data.traceId){
@@ -262,7 +264,7 @@
           }   
         }
         
-        wx.switchTab({url: '/pages/index'})
+        wx.navigateTo({url: `/pages/traceshow?traceId=${result.data.data.traceId}`})
       }
     }
   }
