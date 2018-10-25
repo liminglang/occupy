@@ -1,0 +1,4 @@
+
+  <view class="startbutton">
+    <button open-type="getUserInfo" bindgetuserinfo="userLogin">开始游戏</button>
+  </view>

@@ -119,15 +119,16 @@ export default class extends wepy.app {
       const old_auth_token = globalData.user.auth_token || ''
       let url = baseUrl+`/auth/loginByWeixin`
       const setData = {'code':data.code}
+      console.log("code=========",data.code)
       const res = await req.post(url,setData).catch((err) => {
         console.log("cache error...", err);
         return {}
       })
       if(res){
-        globalData.user.name = res.data.data.userInfo.name
-        globalData.user.gender = res.data.data.userInfo.gender
-        globalData.user.avatar = res.data.data.userInfo.avatar
-        globalData.user.id = res.data.data.userInfo.id
+       globalData.user.name = res.data.data.userInfo.name
+       globalData.user.gender = res.data.data.userInfo.gender
+       globalData.user.avatar = res.data.data.userInfo.avatar
+       globalData.user.id = res.data.data.userInfo.id
       }
     }
   }

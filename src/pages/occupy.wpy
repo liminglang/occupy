@@ -229,12 +229,21 @@
             if (setting.authSetting['scope.userInfo']) {
               const info = await wepy.getUserInfo()
               this.$parent.globalData.userInfo = info.userInfo
+              console.log("info.userInfo======",info.userInfo)
               let url = baseUrl + '/auth/updateUser'
               const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': info.userInfo.avatarUrl, 'gender': info.userInfo.gender}
-              await req.post(url, setData).catch((err)=>{
+              const result = await req.post(url, setData).catch((err)=>{
                 console.log("updateAvatarError...", err.data)})
               this.$parent.globalData.user.name = info.userInfo.nickName;
               this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
+              // let self = this;
+              // wx.downloadFile({
+              //   url:info.userInfo.avatarUrl,
+              //   success(res){
+              //     console.log("res.temppathfile=========",res.tempFilePath)
+              //     self.$parent.globalData.user.avatar = res.tempFilePath
+              //   }
+              // })
             }
           }         
         }
@@ -249,7 +258,7 @@
           for(var i = 0; i<this.imgbox.length ; i++){
             (function(i){
               wx.uploadFile({
-                url: baseUrl + `/image/save?traceId=${result.data.data.traceId}`,
+                url: baseUrl + `/image/save?id=${result.data.data.traceId}`,
                 filePath: self.imgbox[i],
                 name: 'image',
                 formData:{'number':i},
@@ -264,7 +273,7 @@
           }   
         }
         
-        wx.navigateTo({url: `/pages/traceshow?traceId=${result.data.data.traceId}`})
+        wx.navigateTo({url: `/pages/traceshow?traceId=${result.data.data.traceId}&latitude=${this.latitude}&longitude=${this.longitude}`})
       }
     }
   }

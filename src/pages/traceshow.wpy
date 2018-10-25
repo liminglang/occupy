@@ -117,6 +117,7 @@
         </block>
       </view>
       <button class="button" @tap="goBack">回到首页</button>
+      <canvas canvas-id="myCanvas" style='height:300px;width:150px;'/>
     </view>
 </template>
 <script>
@@ -165,6 +166,7 @@
         this.isOwner = true;
       }
       await this.getImages(e.traceId)
+      await this.reDrawMarker(e.traceId,e.latitude,e.longitude)
       this.$apply();
     }
 
@@ -188,12 +190,76 @@
       }
     }
 
+    async reDrawMarker(traceId,latitude,longitude){
+      let self = this;
+      var page = getCurrentPages()[0];
+      console.log("latitude=====,longitude=======",latitude,longitude)
+      if (page == undefined || page == null) return;
+      if (!page.data.isOccupied){
+        const ctx = wepy.createCanvasContext('myCanvas');
+        let width = 0;
+        ctx.beginPath()
+        if(!page.data.isOccupiedByOther){
+          ctx.arc(15, 15, 15, 0, 2 * Math.PI);
+          ctx.clip();
+          ctx.drawImage(this.$parent.globalData.user.avatar, 0, 0, 30, 30);
+          width = 30;
+        }else{
+          let index = 0;
+          for(let k=0;k<page.data.markers.length;k++){
+            console.log("page.data.markers[k].latitude=====,longitude=======",page.data.markers[k].latitude, page.data.markers[k].longitude ,k)
+            if(page.data.markers[k].latitude == latitude && page.data.markers[k].longitude == longitude ){
+              index = k;
+              break;
+            }
+          }
+          console.log("index=======",index)
+          if(index){
+            page.data.markers[index].avatars.push(this.$parent.globalData.user.avatar)
+            for(let i=0; i < page.data.markers[index].avatars.length; i++){
+              ctx.arc(15+i*30, 15, 15, 0, 2 * Math.PI);
+            }
+            ctx.clip();
+            for(let i=0; i < page.data.markers[index].avatars.length; i++){
+              console.log("avatars===========",page.data.markers[index].avatars[i])
+              ctx.drawImage(page.data.markers[index].avatars[i], 0+30*i, 0, 30, 30);
+            }
+            width = 30*page.data.markers[index].avatars.length;
+          }
+          
+          console.log("width==========",width)
+        }
+      //   for(var i=0; i < this.markers[1].avatars.length; i++){
+      //  console.log(this.markers[1].avatars[i])
+        
+        
+  //      }
+        ctx.save()
+        ctx.draw(true, async ()=>{
+        //绘制方法
+          const res = await wepy.canvasToTempFilePath({
+            x:0,
+            y:0,
+            width:width,
+            height:30,
+            destWidth:width,
+            destHeight:30,
+            canvasId: 'myCanvas',
+            fileType: 'jpeg',
+          });
+          console.log("res========",res.tempFilePath)
+          page.afterOccupy(traceId,res.tempFilePath);
+        //  iconPath = res.tempFilePath
+        })
+      } 
+    }
+
     methods = {
       getPost() {
         wx.navigateTo({url: `/pages/post?traceId=${this.id}&declaration=${this.declaration}&dateString=${this.dateString}&locationName=${this.scenic}`})
       },
       goBack() {
-        wx.switchTab({url:'/pages/index'})
+        
       },
       async changeParisecount(traceId){
         if(this.isParised){
