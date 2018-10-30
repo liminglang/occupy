@@ -13,6 +13,25 @@
     height:40px; 
     margin-left : 0;
   }
+  .large{
+    position: fixed;
+    left: 0px;
+    top: 270px;
+  }
+  .narrow{
+    position: fixed;
+    left: 0px;
+    top: 300px;
+  }
+  .occupy{
+    position: fixed;
+    left: 0px;
+    top: 0px;
+  }
+  .img{
+    width: 30px;
+    height: 30px;
+  }
 </style>
 <template>
   <view>
@@ -20,6 +39,15 @@
       <cover-view>
         <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">占领</button>
       </cover-view>
+      <cover-view class="large" @tap="large">
+        <cover-image class="img" src="/static/images/jia.jpg" />
+      </cover-view>
+      <cover-view class="narrow" @tap="narrow">
+        <cover-image class="img" src="/static/images/jian.jpg" />
+      </cover-view>
+      <!-- <cover-view class="occupy" @tap="occupy">
+        <cover-image class="img" src="/static/images/occupy.jpg" />
+      </cover-view> -->
     </map>
     <canvas canvas-id="myCanvas" style='height:300px;width:150px;margin-top:-10000px'/>
   </view>
@@ -104,6 +132,7 @@
       }
     }
     async updated(e) {
+      //this.mapCtx.moveToLocation();
       // console.log(e.type)
       // let self = this;
       // if(e.type == 'end'){
@@ -170,40 +199,6 @@
     }
     async initMarkers(){
       this.markers = []
-      this.controls = [{
-        id: 1,
-        iconPath: '/static/images/jia.jpg',
-        position: {
-        left: 0,
-        top: 300 - 30,
-        width: 30,
-        height: 30
-        },
-        clickable: true
-      },
-      {
-        id: 2,
-        iconPath: '/static/images/jian.jpg',
-        position: {
-        left: 0,
-        top: 330 - 30,
-        width: 30,
-        height: 30
-        },
-        clickable: true
-      },
-      {
-        id: 4,
-        iconPath: '/static/images/occupy.jpg',
-        position: {
-        left: 0,
-        top: 0,
-        width: 50,
-        height: 30
-        },
-        clickable: true
-      }
-      ]
       console.log("初始化之前",this.markers)
       let url = baseUrl + `/trace/isOccupied?latitude=${this.latitude}&longitude=${this.longitude}&userId=${this.$parent.globalData.user.id}`;
       const result = await req.get(url).catch((err)=>{
@@ -353,19 +348,19 @@
     }
     async userLogin(e) {
       const userInfo = e.detail.userInfo;
-      console.log(userInfo)
       if (userInfo) {
         if (!this.$parent.globalData.userInfo) {
           const setting = await wepy.getSetting()
           if (setting.authSetting['scope.userInfo']) {
             const info = await wepy.getUserInfo()
             this.$parent.globalData.userInfo = info.userInfo
+            let avatar = await wepy.downloadFile({url:info.userInfo.avatarUrl});
             let url = baseUrl + '/auth/updateUser'
-            const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': info.userInfo.avatarUrl, 'gender': info.userInfo.gender}
+            const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': avatar.tempFilePath, 'gender': info.userInfo.gender}
             const userId = await req.post(url, setData).catch((err)=>{
               console.log("updateAvatarError...", err.data)})
             this.$parent.globalData.user.name = info.userInfo.nickName;
-            this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
+            this.$parent.globalData.user.avatar = avatar.tempFilePath;
           }
         }
         else{
@@ -377,7 +372,14 @@
       occupy() {
         wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
       },
-
+      large(){
+        this.scale = this.scale+1;
+        this.$apply();
+      },
+      narrow(){
+        this.scale = this.scale - 1;
+        this.$apply();
+      },
       disPlay(){
         if(this.isDisplay){
           this.isDisplay = false;

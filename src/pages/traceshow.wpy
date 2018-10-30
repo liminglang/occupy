@@ -231,6 +231,7 @@
         if(!page.data.isOccupiedByOther){
           ctx.arc(15, 15, 15, 0, 2 * Math.PI);
           ctx.clip();
+          console.log("user.avatar================",this.$parent.globalData.user.avatar)
           ctx.drawImage(this.$parent.globalData.user.avatar, 0, 0, 30, 30);
           width = 30;
         }else{

@@ -61,7 +61,7 @@
       </view>
       <button class='button' @tap="editTrace">编辑我的足迹</button>
       <view class="b" style='width:100%'>
-        <button class='button2' @tap="editTrace">分享我的足迹</button>
+        <button class='button2' open-type="share">分享我的足迹</button>
       </view>
     </view>
   </view>
@@ -92,6 +92,14 @@
       
       onLoad() {
         this.$apply();
+      }
+      onShareAppMessage(res) {
+        let title = "足迹占领";
+        let path = `pages/index`
+        return {
+          title: title,
+          path: path
+        };
       }
       async initChart(canvas, width, height,userId) {
         let self = this
