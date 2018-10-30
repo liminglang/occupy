@@ -10,7 +10,7 @@
     }
   .text {
     width:90%;
-    border:1px solid #EBEBEB;
+    height: 100px;
     min-height:24px;
     background-color:#FFF;
     border-radius:5px 5px;
@@ -34,9 +34,8 @@
     margin-top: 60px;
   }
   .confirm {
-    margin-top: 20px;
     height: 30px;
-    width: 80px;
+    width: 100%;
     display: table;
   }
   .gps {
@@ -47,11 +46,14 @@
     display:flex;
   }
   .up-pic {
-    width: 100%;
+    width: 90%;
+    height: 300px;
+    margin:0 auto;
     justify-content: center;
+    border:1px solid #EBEBEB; 
   }
   .pic-box{  
-    margin-top:20rpx;  
+    margin-top:5rpx;  
     flex-flow:wrap;  
     width:95%;   
   } 
@@ -63,7 +65,7 @@
     height: 160rpx;  
     margin-right: 20rpx;  
     position: relative;  
-    margin: 20rpx 30rpx 20rpx 30rpx;  
+    margin: 15rpx 20rpx 20rpx 30rpx; 
   } 
   .img-de{  
     width:45rpx;  
@@ -83,11 +85,16 @@
     margin-top: 80rpx;
     margin-bottom: 40rpx;
   }
+  .add {
+    margin: 20rpx;
+    width: 80px;
+    height: 70px;
+  }
 </style>
 <template>
     <view>
       <view>占领宣言：</view>
-        <textarea class='text' rows="3" cols="20">{{content}}</textarea>    
+        <textarea rows="3" cols="20">{{content}}</textarea>    
       <view class='up-pic'>
         <view class='flex pic-box'>
           <block wx:key="imgbox" wx:for="{{imgbox}}">
@@ -101,21 +108,19 @@
             </view>
           </block>
           <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
-            <image class='gps' src='/static/images/add_pic.jpg'></image>
+            <image class='add' src='/static/images/add_pic.jpg'></image>
           </view>
         </view>
       </view>
-      <view class="weui-cell">
-        <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-          <view class="weui-cell__hd">
-            <image class="gps" src="/static/images/address.jpg"></image>
-          </view>
-          <view class="weui-cell__bd">{{city}},{{locationName}}</view>
-          <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+      <view style='width:100%'>
+        <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active">
+          <image class="gps" src="/static/images/address.jpg" style='margin-left:30px'></image>
+          <view style='color:red;margin-left:5px'>{{city}},{{locationName}}</view>
+          <view class="weui-cell__ft weui-cell__ft_in-access" style='margin-left:20px'></view>
         </navigator>
       </view>
       <view class="confirm">
-        <button open-type="getUserInfo" bindgetuserinfo="confirm">确认</button>
+        <button  style='margin:0 auto;width:100px;' open-type="getUserInfo" bindgetuserinfo="confirm">确认</button>
       </view>
     </view>
 </template>
@@ -149,7 +154,7 @@
       if(e.imgbox){
         this.imgbox = e.imgbox.split(',')
       }
-      this.content = this.$parent.globalData.user.name +'到此一游！';
+    //  this.content = this.$parent.globalData.user.name +'到此一游！';
       await this.getCityNameFromTX(e.latitude,e.longitude);
       this.$apply();
     }

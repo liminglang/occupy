@@ -18,12 +18,18 @@
     height: 30px;
     width: 30px;
   }
+   .flex {
+    display:flex;
+  }
   .up-pic {
-    width: 100%;
+    width: 90%;
+    height: 300px;
+    margin:0 auto;
     justify-content: center;
+    border:1px solid #EBEBEB; 
   }
   .pic-box{  
-    margin-top:20rpx;  
+    margin-top:5rpx;  
     flex-flow:wrap;  
     width:95%;   
   } 
@@ -35,7 +41,7 @@
     height: 160rpx;  
     margin-right: 20rpx;  
     position: relative;  
-    margin: 20rpx 30rpx 20rpx 30rpx;  
+    margin: 15rpx 10rpx 20rpx 30rpx; 
   } 
   .img-de{  
     width:45rpx;  
@@ -45,9 +51,23 @@
     right:-41rpx;  
     top:5rpx;  
   }
+  .hong-contant .teamwork-btn{
+    width: 360rpx;
+    height: 88rpx; 
+    border-radius: 50rpx;
+    color: white; 
+    background-color:#14a1fd; 
+    margin: 0 auto;
+    margin-top: 80rpx;
+    margin-bottom: 40rpx;
+  }
+  .add {
+    margin: 20rpx;
+    width: 80px;
+    height: 70px;
+  }
 </style>
 <template>
-  <view>
     <view>
       <view>新增足迹<button class='button' @tap="confirm">完成</button>
       </view>
@@ -93,7 +113,7 @@
             </view>
           </block>
           <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
-            <image class='gps' src='/static/images/add_pic.jpg'></image>
+            <image class='add' src='/static/images/add_pic.jpg'></image>
           </view>
         </view>
       </view>
@@ -113,7 +133,6 @@
         </view>
       </repeat>
     </view>   
-  </view>
 </template>
 <script>
   import wepy from 'wepy'

@@ -1,14 +1,68 @@
+<style>
+  .container{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    box-sizing:border-box;
+  }
+  .circleBar {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin-bottom:70px;
+  }
+  
+  .cir {
+    display: inline-block;
+    background-color: #fff;
+    border-radius: 100%;
+  }
+  
+  .top {
+    text-align: center;
+  }
+  .button{
+    position: fixed;
+    top: 0;
+    left: 10px;
+  }
+  .button2{
+    position: fixed;
+    bottom: 20px;
+  }
+  .centerWord {
+    width: 100%;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    text-align: center;
+    color: #3686ff;
+  }
+  .b {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
 <template>
   <view class='container'>
     <ecCanvas id='mychart-dom-area' :canvasId.sync='canvasId' :ec.sync='ec'></ecCanvas>
     <view class='circleBar'>
-      <view class="wrap">
         <view class="top">
           <canvas class="cir" style=' width:100%; height:180px;' canvas-id="canvasArc"></canvas>
           <view class="centerWord">{{resultComment}}</view>
-        </view>
       </view>
       <button class='button' @tap="editTrace">编辑我的足迹</button>
+      <view class="b" style='width:100%'>
+        <button class='button2' @tap="editTrace">分享我的足迹</button>
+      </view>
     </view>
   </view>
 </template>
@@ -215,46 +269,3 @@
     }
 </script>
 
-<style>
-  .container{
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    right:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:space-between;
-    box-sizing:border-box;
-  }
-  .circleBar {
-  width: 100%;
-  height: auto;
-  overflow: hidden;
-  position: relative;
-  }
-  
-  .cir {
-    display: inline-block;
-    background-color: #fff;
-    border-radius: 100%;
-  }
-  
-  .top {
-    text-align: center;
-  }
-  .button{
-    position: fixed;
-    top: 0;
-    left: 10px;
-  }
-  .centerWord {
-    width: 100%;
-    position: absolute;
-    top: 40px;
-    left: 0;
-    text-align: center;
-    color: #3686ff;
-  }
-</style>

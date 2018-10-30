@@ -20,12 +20,13 @@
     flex: 1;
     margin-left: 10px;
     text-overflow:ellipsis;
+    margin-bottom:20px;
   }
   .declaration {
     flex: 1;
+    width: 150px;
     margin-left: 10px;
     text-overflow:ellipsis;
-    width:50px;
     overflow: hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
@@ -39,12 +40,14 @@
   .text {
     display:inline-block;
     margin-left: 10px;
+    margin-bottom:20px;
   }
  .heart{
     display:inline-block;
-    margin-right: 30px;
+    margin-right: 10px;
     height: 25px;
     width: 25px;
+    margin-left: 20px;
   }
   .button {
     display: flex;
@@ -81,21 +84,46 @@
     right:-41rpx;  
     top:5rpx;  
   }
+
+  .a{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .b {
+    margin-top: 20px;
+    width: 90%;
+    margin-left:20px;
+  }
+  .c {
+    display:inline-block;
+    margin-left:40px;
+    margin-top:5px;
+  }
+  .date{
+    display:inline-block;
+    width: auto;
+    margin-left: 30px;
+  }
 </style>
 <template>
     <view>
-     <image class="image" mode="aspectFit" src="{{avatar}}"></image>
-      <view class='text'>
-        <view class='content'>{{name}}</view>
-        <view class='content'>
+      <view class="a">
+        <image class="image" mode="aspectFit" src="{{avatar}}"></image>
+        <view class='text'>
+          <view class='content'>{{name}}</view>
           <view class='declaration'>{{declaration}}</view>
-          <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{id}})'></image>
-          <view style='display:inline-block;margin-left:5px;'>{{parisecount}}</view>
         </view>
-        <image class="gps" src="/static/images/address.jpg"></image>
-        <view class='location'>{{scenic}}</view>
-        <view class='text'>第{{number}}个占领者</view>
+        <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{id}})'></image>
+        <view style='display:inline-block;margin-left:5px;'>{{parisecount}}</view>
       </view>
+     <view class = 'b'>
+      <image class="gps" src="/static/images/address.jpg"></image>
+      <view class='location'>{{scenic}}</view>
+      <view class='date'>{{dateString}}</view>
+     </view>
+     <view class = 'c'>第{{number}}个占领者</view>
       <view class='up-pic'>
         <view class='flex pic-box'>
           <block wx:key="imgbox" wx:for="{{imgbox}}">
@@ -117,7 +145,7 @@
         </block>
       </view>
       <button class="button" @tap="goBack">回到首页</button>
-      <canvas canvas-id="myCanvas" style='height:300px;width:150px;'/>
+      <canvas canvas-id="myCanvas" style='height:300px;width:150px;margin-top:-10000px'/>
     </view>
 </template>
 <script>
@@ -140,7 +168,8 @@
       isOwner:false,
       isParised:false,
       imgbox:[],
-      imageUrl:""
+      imageUrl:"",
+      parisecount:0
     }
     async onLoad(e) {
       console.log(e.traceId);
@@ -229,11 +258,6 @@
           
           console.log("width==========",width)
         }
-      //   for(var i=0; i < this.markers[1].avatars.length; i++){
-      //  console.log(this.markers[1].avatars[i])
-        
-        
-  //      }
         ctx.save()
         ctx.draw(true, async ()=>{
         //绘制方法

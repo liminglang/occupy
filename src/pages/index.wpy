@@ -9,13 +9,18 @@
     bottom: 0;
   }
   .button{
-    position: fixed;
-    top: 0
+    width:80px; 
+    height:40px; 
+    margin-left : 0;
   }
 </style>
 <template>
   <view>
-    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location></map>
+    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location>
+      <cover-view>
+        <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">占领</button>
+      </cover-view>
+    </map>
     <canvas canvas-id="myCanvas" style='height:300px;width:150px;margin-top:-10000px'/>
   </view>
 </template>
@@ -44,6 +49,9 @@
       await this.initMarkers();
       this.mapCtx = wx.createMapContext('map'); 
       this.mapCtx.moveToLocation();
+      if(this.isDisplay){
+        await this.getTraces();
+      }
       this.$apply()
       console.log(this.latitude,this.longitude)
      this.isOnload = true
@@ -93,18 +101,18 @@
         '15':0.0015,
         '16':0.003,
         '17':0.006
-        }
+      }
     }
     async updated(e) {
-      console.log(e.type)
-      let self = this;
-      if(e.type == 'end'){
-        if(this.isDisplay&&this.isOnload){
-          console.log("22222211111111111111111")
-          this.getTraces();
-        }
-      }      
-      this.$apply();
+      // console.log(e.type)
+      // let self = this;
+      // if(e.type == 'end'){
+      //   if(this.isDisplay&&this.isOnload){
+      //     console.log("22222211111111111111111")
+      //     this.getTraces();
+      //   }
+      // }      
+      // this.$apply();
     }
     markertap(e) {
       console.log("e===============",e)
@@ -122,10 +130,11 @@
       console.log(e.controlId)
       if(e.controlId == 1){
         this.scale = this.scale + 1;
-        await this.getTraces();
+        
+     //   await this.getTraces();
       }else if(e.controlId ==2){
         this.scale = this.scale - 1;
-        await this.getTraces();
+    //    await this.getTraces();
       }else if(e.controlId==3){
         console.log("controltap=====",this.latitude,this.longitude)
         wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
@@ -210,7 +219,7 @@
               this.isOccupiedByOther = true;
             }
             this.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-              iconPath: 'https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLPlaI4hfpwT2x1ePByeZibSl3snWZGNIhLGJ2Z39E7ea4v36rjP5xI7GZVBllHCAGtm8KpPdxoyWg/132',
+              iconPath: '/static/images/occupy.jpg',
               id: 0,
               latitude: this.latitude - this.offset[this.scale],
               longitude: this.longitude,
@@ -321,6 +330,7 @@
           });
           // if(markers[j].name=='市政府'){
           markers[j]['iconPath'] = res.tempFilePath
+          console.log("res.tempFilePath==============================",res.tempFilePath)
           // const saveRes = await wepy.saveImageToPhotosAlbum({
           //   filePath: res.tempFilePath
           // }).catch((err)=>{

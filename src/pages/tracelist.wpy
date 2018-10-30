@@ -13,20 +13,21 @@
     width: 30px;
   }
   .image {
-    width: 100px;
-    height: 100px;
+    width: 47px;
+    height: 47px;
     border-radius: 50%;
   }
   .content {
     flex: 1;
     margin-left: 10px;
     text-overflow:ellipsis;
+    margin-bottom:10px;
   }
   .declaration {
     flex: 1;
+    width: 150px;
     margin-left: 10px;
     text-overflow:ellipsis;
-    width:50px;
     overflow: hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
@@ -36,14 +37,6 @@
     margin-left: 10px;
     display:inline-block;
     color:#c1c40d
-  }
-  .button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    display:inline;
-    background-color: #ffffff;
-    margin-left: 30px;
   }
   .address-list {
     width: 100%;
@@ -58,29 +51,56 @@
   .text {
     display:inline-block;
     margin-left: 10px;
+    margin-bottom:20px;
   }
  .heart{
     display:inline-block;
-    margin-right: 30px;
+    margin-right: 10px;
     height: 25px;
     width: 25px;
+    margin-left: 20px;
+  }
+  .slogon {
+    width: 100%;
+    text-align:center;
+  }
+  .a{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .b{
+    display:inline-block;
+    margin-right: 10px;
+  }
+  .button{
+    color: aquamarine;
+    width: 100%
   }
 </style>
 <template>
   <view>
+    <view class='slogon'>获赞数越多排序越靠前,快邀请好友助力吧！</view>
+    <button class="button" open-type="share">邀请好友助力</button>
     <repeat for="{{list}}" key="index" index="index" item="item">
       <view class="list">
-        <image class="image" mode="aspectFit" src="{{item.avatar}}" @tap='showTrace({{item.id}})'></image>
-        <view class='text'>
-          <view class='content'>{{item.name}}</view>
-          <view class='content'>
+        <view class="a">
+          <view style='margin-left:5px;margin-right:5px'>{{index+1}}</view>
+          <image class="image" mode="aspectFit" src="{{item.avatar}}" @tap='showTrace({{item.id}})'></image>
+          <view class='text'>
+            <view class='content'>{{item.name}}</view>
             <view class='declaration'>{{item.declaration}}</view>
-            <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{item.id}}, {{index}})'></image>
-            <view style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
+            <view class = 'b'>
+              <image class="gps" src="/static/images/address.jpg"></image>
+              <view class='location'>{{item.scenic}}</view>
+            </view>
           </view>
-          <image class="gps" src="/static/images/address.jpg"></image>
-          <view class='location'>{{item.scenic}}</view>
-          <view class='text'>第{{item.number}}个占领者</view>
+          <view class='b'>
+            <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{item.id}},{{index}})'></image>
+            <view style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
+            <view class='text'>第{{item.number}}个占领者</view>
+          </view>
         </view>
       </view>
     </repeat>
