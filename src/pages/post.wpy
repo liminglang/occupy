@@ -91,7 +91,6 @@
       this.canvasHeight = height;
       await this.getImages(e.traceId);
       console.log("canvasHeight===========",this.canvasHeight)
-      this.$apply();
       ctx.rect(5,5,width-10,height-10)
       ctx.stroke()
     //   //const radius = width * 105/430
@@ -103,7 +102,9 @@
       ctx.save();
       ctx.restore();
       ctx.beginPath()
-      ctx.drawImage(this.imgbox[0],5, 85, width-10, height-180);
+      console.log("this.imgbox=================",this.imgbox[0])
+      let image = await wepy.downloadFile({url:this.imgbox[0]});
+      ctx.drawImage(image.tempFilePath,5, 85, width-10, height-180);
       ctx.drawImage("/static/images/address.jpg",10, height-55, 13, 20);
       ctx.stroke()
       
@@ -140,6 +141,7 @@
           this.imgbox.push(baseUrl+"/static/image/"+traceId+'/'+result.data.data.images[i]) 
         }
       }
+      this.$apply();
     }
 
     methods = {

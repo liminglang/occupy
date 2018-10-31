@@ -35,7 +35,7 @@
 </style>
 <template>
   <view>
-    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location>
+    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="occupy"  controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location>
       <cover-view>
         <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">占领</button>
       </cover-view>
@@ -66,7 +66,6 @@
     async onLoad(e) {
       await this.$parent.login(e);
       const result = await wepy.getSystemInfo();
-      console.log("result.SDKVersion=====",result.SDKVersion)
       this.height = wepy.getSystemInfoSync().windowHeight
       this.width = wepy.getSystemInfoSync().windowWidth
       const location = await wepy.getLocation({
@@ -85,11 +84,11 @@
      this.isOnload = true
      this.$apply();
     }
-    afterOccupy(traceId,iconPath){
+    afterOccupy(iconPath){
       this.markers[0]= {};
-      let traceIds = []
+    //  let traceIds = []
       let avatars = []
-      traceIds.push(traceId);
+   //   traceIds.push(traceId);
       avatars.push(this.$parent.globalData.user.avatar);
       if(!this.isOccupied){        
         this.markers.push({
@@ -99,8 +98,8 @@
           longitude: this.longitude,
           width: 30,
           height: 30,
-          avatars:avatars,
-          traceIds:traceIds
+          avatars:avatars
+     //     traceIds:traceIds
         })
       }
       console.log("iconPath====",iconPath)
@@ -123,25 +122,11 @@
       isDisplay:true,
       isOnload:false,
       isOccupiedByOther:false,
-      buttonContent:'不显示占领者',
-      offset:{
-        '14':0.00075,
-        '15':0.0015,
-        '16':0.003,
-        '17':0.006
-      }
+      buttonContent:'不显示占领者'
     }
     async updated(e) {
-      //this.mapCtx.moveToLocation();
-      // console.log(e.type)
-      // let self = this;
-      // if(e.type == 'end'){
-      //   if(this.isDisplay&&this.isOnload){
-      //     console.log("22222211111111111111111")
-      //     this.getTraces();
-      //   }
-      // }      
-      // this.$apply();
+      
+      this.$apply();
     }
     markertap(e) {
       console.log("e===============",e)
@@ -153,29 +138,6 @@
         }else{
           wx.navigateTo({url: `/pages/tracelist?latitude=${this.markers[e.markerId].latitude}&longitude=${this.markers[e.markerId].longitude}&scenic=${this.markers[e.markerId].name}`})
         }
-      }
-    }
-    async controltap(e) {
-      console.log(e.controlId)
-      if(e.controlId == 1){
-        this.scale = this.scale + 1;
-        
-     //   await this.getTraces();
-      }else if(e.controlId ==2){
-        this.scale = this.scale - 1;
-    //    await this.getTraces();
-      }else if(e.controlId==3){
-        console.log("controltap=====",this.latitude,this.longitude)
-        wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
-      }else{
-        if(this.isDisplay){
-          this.isDisplay = false;
-        }else{
-          this.isDisplay = true;
-        }
-        this.$apply();
-        this.initMarkers();
-        this.onLoad();
       }
     }
     async getCenterLocation(){
@@ -214,14 +176,18 @@
               this.isOccupiedByOther = true;
             }
             this.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-              iconPath: '/static/images/occupy.jpg',
+              iconPath: '',
               id: 0,
-              latitude: this.latitude - this.offset[this.scale],
+              latitude: this.latitude,
               longitude: this.longitude,
               width: 30,
               height: 30,
               avatars:[],
-              traceIds:[]
+              traceIds:[],
+              callout:{
+                content:'点击占领',
+                display:'ALWAYS'
+              }
             })
           }
       }
@@ -275,76 +241,24 @@
             marker['height'] = 30;
             marker['name'] = i;
             marker['traceIds'] = _.pluck(scenices[i], 'id');
-            marker['avatars'] = _.pluck(scenices[i], 'avatar');
+            marker['iconPath'] = scenices[i][0].iconPath
+          //  marker['avatars'] = _.pluck(scenices[i], 'avatar');
             self.markers.push(marker);
             k = k+1;
           }
         }
         console.log("draw之前",self.markers)
-        setTimeout(async()=>{
-          await self.drawAvatar(self.markers);
-        },200) 
+        // setTimeout(async()=>{
+        //   await self.drawAvatar(self.markers);
+        // },200) 
         self.$apply();
       },1000);
       
         
      // this.$apply();
     }
-    async drawAvatar(markers){
-      let self = this
-      console.log("刚进入draw====",markers)
-      const ctx = wepy.createCanvasContext('myCanvas');
-      ctx.beginPath()
-     // console.log(markers.length)
-      for(var j=1; j < markers.length; j++){
-      //  console.log(markers[j].avatars[0])
-        for(var i=0; i < markers[j].avatars.length; i++){
-          ctx.arc(15+i*30, 15+(j-1)*30, 15, 0, 2 * Math.PI);
-        }
-      }
-      ctx.clip();
-      for(var j=1; j < markers.length; j++){
-        for(var i=0; i < markers[j].avatars.length; i++){
-          console.log(markers[j].avatars[i])
-          ctx.drawImage(markers[j].avatars[i], 0+30*i, 30*(j-1), 30, 30);
-        }
-      }      
-      ctx.save()
-      ctx.draw(true, async ()=>{
-        //绘制方法
-        for(var j=1; j < markers.length; j++){
-          const res = await wepy.canvasToTempFilePath({
-            x:0,
-            y:30*(j-1),
-            width:30*markers[j].avatars.length,
-            height:30,
-            destWidth:30*markers[j].avatars.length,
-            destHeight:30,
-            canvasId: 'myCanvas',
-            fileType: 'jpeg',
-          });
-          // if(markers[j].name=='市政府'){
-          markers[j]['iconPath'] = res.tempFilePath
-          console.log("res.tempFilePath==============================",res.tempFilePath)
-          // const saveRes = await wepy.saveImageToPhotosAlbum({
-          //   filePath: res.tempFilePath
-          // }).catch((err)=>{
-          //   return false;
-          // });
-          // console.log("saveRes=============",saveRes)
-          // if(saveRes){
-          //   wepy.showToast({
-          //     title: "已保存至相册",
-          //     icon: "none"
-          //   });
-          // }
-        }
-        self.markers = markers;
-        self.$apply();
-      })
-     
-      console.log("********************",this.markers) 
-      this.$apply()
+    occupy() {
+      wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
     }
     async userLogin(e) {
       const userInfo = e.detail.userInfo;
@@ -369,16 +283,28 @@
       }
     }
     methods = {
-      occupy() {
-        wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
-      },
       large(){
-        this.scale = this.scale+1;
-        this.$apply();
+        let self = this;
+        this.mapCtx.getCenterLocation({
+          success (res) {
+            self.latitude = res.latitude;
+            self.longitude = res.longitude;
+            self.scale = self.scale+1;
+            self.$apply();
+          }
+        })
+        //console.log("large之后=====",this.latitude,this.longitude)
       },
       narrow(){
-        this.scale = this.scale - 1;
-        this.$apply();
+        let self = this;
+        this.mapCtx.getCenterLocation({
+          success (res) {
+            self.latitude = res.latitude;
+            self.longitude = res.longitude;
+            self.scale = self.scale-1;
+            self.$apply();
+          }
+        })
       },
       disPlay(){
         if(this.isDisplay){

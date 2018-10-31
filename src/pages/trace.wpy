@@ -102,6 +102,9 @@
         };
       }
       async initChart(canvas, width, height,userId) {
+        wx.showLoading({
+          title: '加载中',
+        })
         let self = this
         var mapFeatures = geoJson.features;
         let geoCoordMap = []
@@ -267,6 +270,7 @@
         cxt_arc.stroke();//对当前路径进行描边
         cxt_arc.draw()
         chart.setOption(option);
+        wx.hideLoading();
         return chart;
         }
       methods = {
