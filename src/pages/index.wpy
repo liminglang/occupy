@@ -37,7 +37,7 @@
   <view>
     <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="occupy"  controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location>
       <cover-view>
-        <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">占领</button>
+        <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">点击授权</button>
       </cover-view>
       <cover-view class="large" @tap="large">
         <cover-image class="img" src="/static/images/jia.jpg" />
@@ -103,9 +103,11 @@
         })
       }
       console.log("iconPath====",iconPath)
+      console.log("onshow============",this.markers)
       this.$apply();
     }
     async onShow() {
+      
     }
 
     data = {
@@ -191,11 +193,9 @@
             })
           }
       }
-      console.log("初始化之后",this.markers)
       this.$apply();
     }
     async getTraces(){
-      console.log("this.scale================",this.scale)
       let self = this;
       wx.getLocation({
         type: 'gcj02',
@@ -207,9 +207,6 @@
       })
       await this.getRegion();
       this.initMarkers();
-      console.log("this.markers=====",this.markers)
-      console.log("进入settimeout之前latitude========,longitude========",self.latitude,self.longitude)
-      console.log("进入settimeout之前range_x1========,range_y1========",self.range_x,self.range_y)
       let latitude1,longitude1,range_x1,range_y1;
       latitude1 = self.latitude
       longitude1 = self.longitude     
@@ -222,15 +219,12 @@
           range_y1 = range_y1 - longitude1;
          // self.$apply();
         }
-        console.log("self==========",self)
-        console.log("latitude========,longitude========",latitude1,longitude1)
         let url = baseUrl + `/trace/getTraces?latitude=${latitude1}&longitude=${longitude1}&range_x=0.25&range_y=0.25`;
         const traces = await req.get(url).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         if (traces.data) {
           let data = traces.data.data;
           let scenices = _.groupBy(data,function(obj){return obj.scenic});
-          console.log("scenices==============",scenices)
           let k = 1;
           for(var i in scenices) {
             let marker = {};
@@ -241,24 +235,82 @@
             marker['height'] = 30;
             marker['name'] = i;
             marker['traceIds'] = _.pluck(scenices[i], 'id');
-            marker['iconPath'] = scenices[i][0].iconPath
-          //  marker['avatars'] = _.pluck(scenices[i], 'avatar');
+           // marker['iconPath'] = scenices[i][0].iconPath
+            marker['avatars'] = _.pluck(scenices[i], 'avatar');
             self.markers.push(marker);
             k = k+1;
           }
         }
-        console.log("draw之前",self.markers)
-        // setTimeout(async()=>{
-        //   await self.drawAvatar(self.markers);
-        // },200) 
+        setTimeout(async()=>{
+          await self.drawAvatar(self.markers);
+        },200) 
         self.$apply();
       },1000);
       
         
      // this.$apply();
     }
-    occupy() {
-      wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
+    async drawAvatar(markers){
+      let self = this
+      const ctx = wepy.createCanvasContext('myCanvas');
+      ctx.beginPath()
+     // console.log(markers.length)
+      for(var j=1; j < markers.length; j++){
+      //  console.log(markers[j].avatars[0])
+        for(var i=0; i < markers[j].avatars.length; i++){
+          ctx.arc(15+i*30, 15+(j-1)*30, 15, 0, 2 * Math.PI);
+        }
+      }
+      ctx.clip();
+      for(var j=1; j < markers.length; j++){
+        for(var i=0; i < markers[j].avatars.length; i++){
+          console.log(markers[j].avatars[i])
+          let avatar = await wepy.downloadFile({url:markers[j].avatars[i]}); 
+          ctx.drawImage(avatar.tempFilePath, 0+30*i, 30*(j-1), 30, 30);
+        }
+      }      
+      ctx.save()
+      ctx.draw(true, async ()=>{
+        //绘制方法
+        for(var j=1; j < markers.length; j++){
+          const res = await wepy.canvasToTempFilePath({
+            x:0,
+            y:30*(j-1),
+            width:30*markers[j].avatars.length,
+            height:30,
+            destWidth:30*markers[j].avatars.length,
+            destHeight:30,
+            canvasId: 'myCanvas',
+            fileType: 'jpeg',
+          });
+          // if(markers[j].name=='市政府'){
+          markers[j]['iconPath'] = res.tempFilePath
+          // const saveRes = await wepy.saveImageToPhotosAlbum({
+          //   filePath: res.tempFilePath
+          // }).catch((err)=>{
+          //   return false;
+          // });
+          // console.log("saveRes=============",saveRes)
+          // if(saveRes){
+          //   wepy.showToast({
+          //     title: "已保存至相册",
+          //     icon: "none"
+          //   });
+          // }
+        }
+        self.markers = markers;
+        self.$apply();
+      })
+    }
+    async occupy() {
+      const setting = await wepy.getSetting()
+      if (!setting.authSetting['scope.userInfo']){
+        wx.showToast({
+          title: '请先授权',
+          icon:'none'})
+      }else{
+        wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
+      }
     }
     async userLogin(e) {
       const userInfo = e.detail.userInfo;
@@ -268,13 +320,13 @@
           if (setting.authSetting['scope.userInfo']) {
             const info = await wepy.getUserInfo()
             this.$parent.globalData.userInfo = info.userInfo
-            let avatar = await wepy.downloadFile({url:info.userInfo.avatarUrl});
+         //   let avatar = await wepy.downloadFile({url:info.userInfo.avatarUrl});
             let url = baseUrl + '/auth/updateUser'
-            const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': avatar.tempFilePath, 'gender': info.userInfo.gender}
+            const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': info.userInfo.avatarUrl, 'gender': info.userInfo.gender}
             const userId = await req.post(url, setData).catch((err)=>{
               console.log("updateAvatarError...", err.data)})
             this.$parent.globalData.user.name = info.userInfo.nickName;
-            this.$parent.globalData.user.avatar = avatar.tempFilePath;
+            this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
           }
         }
         else{

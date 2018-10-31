@@ -149,6 +149,7 @@
       latitude:'',
       iconPath:'',
       province:'',
+      iconPath:'',
     //  imageUrl:'/static/images/ic_menu_topic_nor.jpg',
       imgbox:[]
     }
@@ -199,7 +200,8 @@
         if(!page.data.isOccupiedByOther){
           ctx.arc(15, 15, 15, 0, 2 * Math.PI);
           ctx.clip();
-          ctx.drawImage(this.$parent.globalData.user.avatar, 0, 0, 30, 30);
+          let avatar = await wepy.downloadFile({url:this.$parent.globalData.user.avatar}); 
+          ctx.drawImage(avatar.tempFilePath, 0, 0, 30, 30);
           width = 30;
         }else{
           let index = 0;
@@ -217,7 +219,8 @@
             }
             ctx.clip();
             for(let i=0; i < page.data.markers[index].avatars.length; i++){
-              ctx.drawImage(page.data.markers[index].avatars[i], 0+30*i, 0, 30, 30);
+              let avatar = await wepy.downloadFile({url:page.data.markers[index].avatars[i]}); 
+              ctx.drawImage(avatar.tempFilePath, 0+30*i, 0, 30, 30);
             }
             width = 30*page.data.markers[index].avatars.length;
           }
@@ -239,7 +242,6 @@
           console.log("res========",res.tempFilePath)
           self.iconPath = res.tempFilePath;
           self.$apply();
-          page.afterOccupy(res.tempFilePath);
         //  iconPath = res.tempFilePath
         })
       } 
@@ -310,12 +312,12 @@
       },
 
       async confirm(e) {       
-        let markerUrl = baseUrl + '/marker/updateMarker'
-        const markerData = {'latitude': this.latitude, 'longitude': this.longitude,'iconPath':this.iconPath}
-        const markerId = await req.post(markerUrl, markerData).catch((err)=>{
-          console.log("updateAvatarError...", err.data)})
+        // let markerUrl = baseUrl + '/marker/updateMarker'
+        // const markerData = {'latitude': this.latitude, 'longitude': this.longitude,'iconPath':this.iconPath}
+        // const markerId = await req.post(markerUrl, markerData).catch((err)=>{
+        //   console.log("updateAvatarError...", err.data)})
         let url = baseUrl + '/trace/addTrace';
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content, 'province':this.province, 'city':this.city, 'markerId':markerId.data.data.markerId}
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.locationName, 'declaration':this.content, 'province':this.province, 'city':this.city}
         const result = await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         
@@ -339,7 +341,9 @@
             })(i)
           }   
         }
-        
+        var page = getCurrentPages()[0];
+        if (page == undefined || page == null) return;
+        page.afterOccupy(this.iconPath);
         wx.navigateTo({url: `/pages/traceshow?traceId=${result.data.data.traceId}&latitude=${this.latitude}&longitude=${this.longitude}`})
       }
     }

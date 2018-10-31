@@ -231,26 +231,12 @@
       },
 
       async confirm(e) {
-        const userInfo = e.detail.userInfo;
-        console.log(userInfo)
-        if (userInfo) {
-          if (!this.$parent.globalData.userInfo) {
-            const setting = await wepy.getSetting()
-            if (setting.authSetting['scope.userInfo']) {
-              const info = await wepy.getUserInfo()
-              this.$parent.globalData.userInfo = info.userInfo
-              let url = baseUrl + '/auth/updateUser'
-              const setData = {'id':this.$parent.globalData.user.id, 'name': info.userInfo.nickName, 'avatar': info.userInfo.avatarUrl, 'gender': info.userInfo.gender}
-              await req.post(url, setData).catch((err)=>{
-                console.log("updateAvatarError...", err.data)})
-              this.$parent.globalData.user.name = info.userInfo.nickName;
-              this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
-            }
-          }         
-        }
-        
+        let markerUrl = baseUrl + '/marker/updateMarker'
+        const markerData = {'latitude': this.latitude, 'longitude': this.longitude,'iconPath':this.iconPath}
+        const markerId = await req.post(markerUrl, markerData).catch((err)=>{
+          console.log("updateAvatarError...", err.data)})
         let url = baseUrl + '/trace/addTrace';
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city}
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city, 'markerId':markerId.data.data.markerId}
         const result = await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         if(result.data.data.traceId){
