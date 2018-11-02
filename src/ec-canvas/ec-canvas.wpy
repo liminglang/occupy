@@ -7,6 +7,7 @@
 
 <script>
     import wepy from 'wepy';
+    import 'wepy-async-function'
     import WxCanvas from '../ec-canvas/wx-canvas';
     import * as echarts from '../ec-canvas/echarts.min';
     export default class EcCanvas extends wepy.component {
@@ -105,6 +106,7 @@
     .ec-canvas {
         width: 100%;
         height: 100%;
+        margin-top: -20%;
         display: block;
     }
 </style>

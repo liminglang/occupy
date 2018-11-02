@@ -1,14 +1,7 @@
 <style lang="less">
-  .startbutton {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+ 
 </style>
 <template>
-  <view class="startbutton">
-    <button @tap="startGame">回到首页</button>
-  </view>
 </template>
 <script>
   import wepy from 'wepy'
@@ -17,18 +10,6 @@
       navigationBarTitleText: '足迹占领'
     } 
     async onLoad(e) {
-      console.log(this.$parent.globalData.user.name,e);
-      wx.chooseLocation({
-        success: function (res) {    
-          wx.navigateTo({url: `/pages/occupy?locationName=${res.name}&latitude=${res.latitude}&longitude=${res.longitude}&imgbox=${e.imgbox}`})
-        }
-      }) 
-    }
-    
-    methods = {
-      startGame() {
-        wepy.navigateTo({url: '/pages/index'})
-      }
-    }
+  }
   }
 </script>

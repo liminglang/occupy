@@ -37,7 +37,9 @@
   <view>
     <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="occupy"  controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location>
       <cover-view>
-        <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">点击授权</button>
+        <block wx:if="{{!isAuth}}">
+          <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">点击授权</button>
+        </block>
       </cover-view>
       <cover-view class="large" @tap="large">
         <cover-image class="img" src="/static/images/jia.jpg" />
@@ -65,6 +67,10 @@
     
     async onLoad(e) {
       await this.$parent.login(e);
+      const setting = await wepy.getSetting()
+      if (!setting.authSetting['scope.userInfo']){
+        this.isAuth = false;
+      }
       const result = await wepy.getSystemInfo();
       this.height = wepy.getSystemInfoSync().windowHeight
       this.width = wepy.getSystemInfoSync().windowWidth
@@ -79,8 +85,6 @@
       if(this.isDisplay){
         await this.getTraces();
       }
-      this.$apply()
-      console.log(this.latitude,this.longitude)
      this.isOnload = true
      this.$apply();
     }
@@ -124,7 +128,8 @@
       isDisplay:true,
       isOnload:false,
       isOccupiedByOther:false,
-      buttonContent:'不显示占领者'
+      buttonContent:'不显示占领者',
+      isAuth:true
     }
     async updated(e) {
       
@@ -303,8 +308,7 @@
       })
     }
     async occupy() {
-      const setting = await wepy.getSetting()
-      if (!setting.authSetting['scope.userInfo']){
+      if (!this.isAuth){
         wx.showToast({
           title: '请先授权',
           icon:'none'})

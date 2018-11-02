@@ -231,12 +231,12 @@
       },
 
       async confirm(e) {
-        let markerUrl = baseUrl + '/marker/updateMarker'
-        const markerData = {'latitude': this.latitude, 'longitude': this.longitude,'iconPath':this.iconPath}
-        const markerId = await req.post(markerUrl, markerData).catch((err)=>{
-          console.log("updateAvatarError...", err.data)})
+        // let markerUrl = baseUrl + '/marker/updateMarker'
+        // const markerData = {'latitude': this.latitude, 'longitude': this.longitude,'iconPath':this.iconPath}
+        // const markerId = await req.post(markerUrl, markerData).catch((err)=>{
+        //   console.log("updateAvatarError...", err.data)})
         let url = baseUrl + '/trace/addTrace';
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city, 'markerId':markerId.data.data.markerId}
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city}
         const result = await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         if(result.data.data.traceId){

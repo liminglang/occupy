@@ -115,7 +115,7 @@
           <view class='content'>{{name}}</view>
           <view class='declaration'>{{declaration}}</view>
         </view>
-        <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{id}})'></image>
+        <image class="heart" mode="aspectFit" src="{{imageUrl}}" @tap='changeParisecount({{id}})'></image>
         <view wx:if="{{parisecount}}" style='display:inline-block;margin-left:5px;'>{{parisecount}}</view>
       </view>
      <view class = 'b'>
@@ -144,7 +144,6 @@
           <button class="button" open-type="share">分享给好友</button>
         </block>
       </view>
-      <button class="button" @tap="goBack">回到首页</button>
       <canvas canvas-id="myCanvas" style='height:300px;width:150px;margin-top:-10000px'/>
     </view>
 </template>
@@ -168,7 +167,7 @@
       isOwner:false,
       isParised:false,
       imgbox:[],
-      imageUrl:"",
+      imageUrl:"/static/images/heart.jpg",
       parisecount:0
     }
     async onLoad(e) {
@@ -193,6 +192,14 @@
       this.dateString = year + '.' + month + '.' + day;
       if(trace.userId == this.$parent.globalData.user.id){
         this.isOwner = true;
+      }
+      const storage = await wepy.getStorage({
+        key:this.$parent.globalData.user.id+this.id
+      })
+      console.log(storage.data)
+      if(storage.data){
+        this.imageUrl = "/static/images/zan.jpg";
+        this.isParised = true;
       }
       await this.getImages(e.traceId)
     //  await this.reDrawMarker(e.traceId,e.latitude,e.longitude)
@@ -230,9 +237,19 @@
         if(this.isParised){
           this.parisecount--;
           this.isParised = false;
+          wx.setStorage({
+            key:this.$parent.globalData.user.id + this.id,
+            data:0
+          })
+          this.imageUrl = "/static/images/heart.jpg"
         }else{
           this.parisecount++;
           this.isParised = true;
+          wx.setStorage({
+            key:this.$parent.globalData.user.id + this.id,
+            data:1
+          })
+          this.imageUrl = "/static/images/zan.jpg"
         }
         this.$apply();
         let url = baseUrl + `/trace/updateTrace?id=${traceId}`

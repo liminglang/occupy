@@ -50,25 +50,71 @@
     align-items: center;
     justify-content: center;
   }
+  .a{
+    display: flex;
+    width: 100%;
+  }
+  .image{
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+  }
+  .modal-mask {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: 0.5;
+    overflow: hidden;
+    z-index: 9000;
+    color: #fff;
+  }
+
+.modal-dialog {
+  width: 70%;
+  overflow: hidden;
+  position: fixed;
+  top: 70%;
+  left: 0;
+  z-index: 9999;
+  background: #f9f9f9;
+  margin: -180rpx 105rpx;
+  border-radius: 36rpx;
+}
 </style>
 <template>
   <view class='container'>
     <ecCanvas id='mychart-dom-area' :canvasId.sync='canvasId' :ec.sync='ec'></ecCanvas>
-    <view class='circleBar'>
+    <button class='button' @tap="editTrace">编辑我的足迹</button>
+    <!-- <view class='circleBar'>
         <view class="top">
           <canvas class="cir" style=' width:100%; height:180px;' canvas-id="canvasArc"></canvas>
           <view class="centerWord">{{resultComment}}</view>
       </view>
-      <button class='button' @tap="editTrace">编辑我的足迹</button>
+      
       <view class="b" style='width:100%'>
-        <button class='button2' open-type="share">分享我的足迹</button>
+        <button class='button2' @tap='share'>分享我的足迹</button>
+      </view>
+    </view> -->
+    <view class="b" style='width:100%'>
+        <button class='button2' @tap='share'>分享我的足迹</button>
+    </view>
+    <!-- <canvas class="cir" style=' width:100%; height:180px;' canvas-id="canvasArc"></canvas> -->
+    <view class="modal-mask" @tap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></view>
+    <view class="modal-dialog" wx:if="{{showModal}}">
+      <view class='a'>
+        <button open-type="share"><image class='image' src='/static/images/weixin.jpg' ></image>发生给好友</button>
+        <button @tap='savePhoto'><image class='image' src='/static/images/friend.jpg'></image>保存到手机</button>
       </view>
     </view>
   </view>
-</template>
+</template> 
 
 <script>
     import wepy from 'wepy';
+    import 'wepy-async-function'
     import { baseUrl, appId} from '@/config'
     import req from '@/network'
     import _ from 'underscore'
@@ -84,14 +130,19 @@
       };
       data = {
           canvasId: 'myMap',
+          showModal:false,
+          echart:'',
           ec: {
-              onInit: this.initChart
+              onInit: this.initChart,
+              myChart:''
           },
           geoCoordMap:[],
       };
       
       onLoad() {
+        
         this.$apply();
+        console.log("ec========",this.ec)
       }
       onShareAppMessage(res) {
         let title = "足迹占领";
@@ -105,23 +156,31 @@
         wx.showLoading({
           title: '加载中',
         })
-        let self = this
+        console.log("width,height========",width,height)
+        let self = this;
+        let height1 = wepy.getSystemInfoSync().windowHeight
+        let width1 = wepy.getSystemInfoSync().windowWidth
         var mapFeatures = geoJson.features;
         let geoCoordMap = []
         let url = baseUrl + `/trace/getMyTraces?userId=${userId}`;
         const traces = await req.get(url).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
-        console.log(traces,"****************");
+        let provinces = [];
         if (traces.data) {
           let data = traces.data.data;
+          console.log("data============",data)
           for(var i=0;i<data.length;i++) {
             let marker = {};
+            let province = {};
             marker['id'] = data[i].id
             marker['value'] = [data[i].longitude,data[i].latitude]
+            province['name'] = data[i].province.substring(0,data[i].province.length-1);
             geoCoordMap.push(marker);
+            provinces.push(province)
           }
         }
-        console.log("geoCoordMap===============",geoCoordMap)
+        let cityCount =  _.size(_.groupBy(traces.data.data,function(obj){return obj.city}));
+        let provinceCount =  _.size(_.groupBy(traces.data.data,function(obj){return obj.province}));
         const chart = echarts.init(canvas, null, {
             width: width,
             height: height
@@ -131,18 +190,6 @@
         const option = {
           tooltip: {
             trigger: 'item'
-          },
-
-          toolbox: {
-            show: true,
-            orient: 'vertical',
-            left: 'right',
-            top: 'center',
-            feature: {
-              dataView: { readOnly: false },
-              restore: {},
-              saveAsImage: {}
-            }
           },
           geo: {
             show: true,
@@ -169,28 +216,27 @@
           series: [{
             type: 'map',
             mapType: 'china',
+            symbol: 'pin', //气泡
+            symbolSize:3,
             label: {
-              normal: {
-                show: true
-              },
-              emphasis: {
-                textStyle: {
-                  color: 'yellow'
-                }
-              }
+                show: false
             },
             itemStyle: {
-
-              normal: {
-                borderColor: '#389BB7',
-                areaColor: '#fff',
-              },
-              emphasis: {
-                areaColor: 'lightskyblue',
-                borderWidth: 0
-              }
+                normal: {
+                    borderColor: 'grey',
+                    areaColor: '#2678b2',
+                    label: {
+                        show: false
+                    }
+                },
+                emphasis: {
+                    areaColor: 'yellow',
+                    label: {
+                        show: false
+                    }
+                }
             },
-            animation: false
+            data: provinces
           },
           {
             name: '散点',
@@ -212,70 +258,150 @@
                     color: '#05C3F9'
                 }
             }
-          }
+          },
+          {
+            name:'省份',
+            type:'pie',
+            radius: ['17%', '20%'],
+            center:['25%','85%'],
+            avoidLabelOverlap: false,
+            hoverAnimation:false,
+            label: {
+                normal: {
+                    show: true,
+                    color: '#fb8800',
+                    formatter:function (params){
+                        return "省份\n" + provinceCount
+                    },
+                    position: 'center',
+                    textStyle: {
+                       fontSize: '16',
+                        fontWeight: 'bold'
+                     }
+                }
+            },
+            data:[
+                {value:provinceCount, name:'省份'},
+                {value:34-provinceCount, name:''}
+                ]
+          },
+          {
+            name:'城市',
+            type:'pie',
+            radius: ['17%', '20%'],
+            center:['75%','85%'],
+            avoidLabelOverlap: false,
+            hoverAnimation:false,
+            label: {
+                normal: {
+                    show: true,
+                    color: '#fb8800',
+                    formatter:function (params){
+                        return "城市\n" + cityCount
+                    },
+                    position: 'center',
+                    textStyle: {
+                       fontSize: '16',
+                        fontWeight: 'bold'
+                     }
+                }
+            },
+            data:[
+                {value:cityCount, name:'城市'},
+                {value:100-cityCount, name:''}
+                ]
+          },
+          {
+            name:'',
+            type:'pie',
+            radius: ['22%', '25%'],
+            center:['50%','85%'],
+            avoidLabelOverlap: false,
+            hoverAnimation:false,
+            label: {
+                normal: {
+                    show: true,
+                    color: '#fb8800',
+                    formatter:function (params){
+                        return "超过了\n" + "80%\n" +"的小伙伴"
+                    },
+                    position: 'center',
+                    textStyle: {
+                       fontSize: '16',
+                        fontWeight: 'bold'
+                     }
+                }
+            },
+            data:[
+                {value:80, name:'省份'},
+                {value:100-80, name:''}
+                ]
+          },
           ],
-
+        color: ['#339900', '#C9C9C9']
         };
-        let cxt_arc = wx.createCanvasContext('canvasArc');//创建并返回绘图上下文context对象。
-        let cityCount =  _.size(_.groupBy(traces.data.data,function(obj){return obj.city}));
-        let provinceCount =  _.size(_.groupBy(traces.data.data,function(obj){return obj.province}));
-        console.log(cityCount,provinceCount)
-        const width1 = wepy.getSystemInfoSync().windowWidth;
-        cxt_arc.setLineWidth(6);//绘线的宽度
-        cxt_arc.setStrokeStyle('#d2d2d2');//绘线的颜色
-        cxt_arc.setLineCap('round');//线条端点样式
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width1/2, 53, 45, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
-        cxt_arc.setFontSize(14)
-        cxt_arc.fillText('超过了', width1/2-20, 35);
-        cxt_arc.fillText('的小伙伴', width1/2-27, 75);
-        cxt_arc.setFontSize(20)
-        cxt_arc.setFillStyle('red')
-        cxt_arc.fillText('80%', width1/2-20, 55);
-        cxt_arc.closePath()
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width1/2-95, 53, 40, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
-        cxt_arc.setFontSize(14)
-        cxt_arc.setFillStyle('black')
-        cxt_arc.fillText('省份', width1/2-95-15, 40);
-        cxt_arc.setFontSize(20)
-        cxt_arc.setFillStyle('red')
-        cxt_arc.fillText(String(provinceCount), width1/2-95-15, 66);
-        cxt_arc.closePath()
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width1/2+95, 53, 40, 0, 2 * Math.PI, false);//设置一个原点(53,53)，半径为50的圆的路径到当前路径
-        cxt_arc.setFontSize(14)
-        cxt_arc.setFillStyle('black')
-        cxt_arc.fillText('城市', width1/2+95-15, 40);
-        cxt_arc.setFontSize(20)
-        cxt_arc.setFillStyle('red')
-        cxt_arc.fillText(String(cityCount), width1/2+95-15, 66);
-        cxt_arc.closePath()
-        cxt_arc.stroke();//对当前路径进行描边
-        //cxt_arc.stroke();//对当前路径进行描边
-        //这部分是蓝色部分
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.setLineWidth(6);
-        cxt_arc.setStrokeStyle('#3ea6ff');
-        cxt_arc.setLineCap('round')
-        cxt_arc.arc(width1/2, 53, 45, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width1/2-95, 53, 40, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.beginPath();//开始一个新的路径
-        cxt_arc.arc(width1/2+95, 53, 40, -Math.PI * 1 / 2, 2 * Math.PI * 0.8 - Math.PI * 1 / 2, false);
-        cxt_arc.stroke();//对当前路径进行描边
-        cxt_arc.draw()
+        var count = 0;
+        var timeTicket = null;
+        var dataLength = option.series[0].data.length;
+        timeTicket && clearInterval(timeTicket);
+        timeTicket = setInterval(function() {
+            chart.dispatchAction({
+                type: 'highlight',
+                seriesIndex: 0,
+                dataIndex: (count) % dataLength
+            });
+            count++;
+        }, 100);
         chart.setOption(option);
+        let ctx = chart._dom.ctx;
+        ctx.draw(true);
         wx.hideLoading();
-        return chart;
+       // return chart;
+        }
+      preventTouchMove() {
         }
       methods = {
         editTrace(){
           wx.navigateTo({url: 'edittrace'})
+        },
+        hideModal(){
+          this.showModal = false;
+          this.$apply();
+        },
+        share(){
+          this.showModal = true;
+          this.$apply();
+        },
+        savePhoto(){
+         let height1 = wepy.getSystemInfoSync().windowHeight
+         let width1 = wepy.getSystemInfoSync().windowWidth
+         setTimeout(async () => {
+          wx.canvasToTempFilePath({
+            x:0,
+            y:70,
+            width:width1,
+            height:height1-70,
+            destWidth:width1,
+            destHeight:height1-70,
+            fileType:'jpg',
+            quality:1,
+            canvasId: 'myMap',
+            success: function(res) {
+              wx.saveImageToPhotosAlbum({
+                filePath:res.tempFilePath,
+                success(res) {
+                  wx.showToast({
+                    title: "已保存至相册",
+                    icon: "none"
+                  });
+                }
+              })
+            },
+            fail: function(res) {
+              console.log("err==================",res.errMsg)
+            }
+          })
+        }, 1000)
         }
       }
     }

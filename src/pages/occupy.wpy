@@ -37,6 +37,7 @@
     height: 30px;
     width: 100%;
     display: table;
+    margin-top: 30px;
   }
   .gps {
     height: 30px;
@@ -97,11 +98,18 @@
     align-items: center;
     width: 100%;
   }
+  .selectlocation{
+    border-bottom:10px solid transparent;
+    border-top:10px soild transparent;
+    border-left:30px soild transparent;
+    border-right:30px soild transparent;
+    display:inline-block;margin:0 auto;width:30px;
+  }
 </style>
 <template>
     <view>
       <view>占领宣言：</view>
-        <textarea rows="3" cols="20">{{content}}</textarea>    
+        <textarea rows="2" cols="20" style='height:100px'>{{content}}</textarea>    
       <view class='up-pic'>
         <view class='flex pic-box'>
           <block wx:key="imgbox" wx:for="{{imgbox}}">
@@ -122,8 +130,8 @@
       <view class='a'>
         <!-- <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active"> -->
           <image class="gps" src="/static/images/address.jpg" style='margin-left:30px'></image>
-          <view style='color:red;margin-left:5px;display:inline-block'>{{city}},{{locationName}}</view>
-          <view class="weui-cell__ft_in-access" style='display:inline-block;margin:0 auto;width:30px' @tap='chooseLocation'></view>
+          <view style='color:blue;margin-left:5px;display:inline-block'>{{city}}.{{locationName}}</view>
+          <view class="weui-cell__ft_in-access selectlocation" @tap='chooseLocation'></view>
         <!-- </navigator> -->
       </view>
       <view class="confirm">
