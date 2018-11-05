@@ -12,8 +12,6 @@
     width: 30px;
   }
   .image {
-    width: 100px;
-    height: 100px;
     border-radius: 50%;
   }
   .content {
@@ -24,7 +22,7 @@
   }
   .declaration {
     flex: 1;
-    width: 150px;
+    width: 100%;
     margin-left: 10px;
     text-overflow:ellipsis;
     overflow: hidden;
@@ -35,12 +33,13 @@
     flex: 1;
     margin-left: 10px;
     display:inline-block;
-    color:#c1c40d
+    color:#8BC34A
   }
   .text {
     display:inline-block;
     margin-left: 10px;
     margin-bottom:20px;
+    width: 40%;
   }
  .heart{
     display:inline-block;
@@ -70,8 +69,6 @@
     position: relative;  
   }
   .add-pic{  
-    width: 160rpx;  
-    height: 160rpx;  
     margin-right: 20rpx;  
     position: relative;  
     margin: 20rpx 30rpx 20rpx 30rpx;  
@@ -110,7 +107,7 @@
 <template>
     <view>
       <view class="a">
-        <image class="image" mode="aspectFit" src="{{avatar}}"></image>
+        <image class="image" style='height:{{height}}px;width:{{width}}px' mode="aspectFit" src="{{avatar}}"></image>
         <view class='text'>
           <view class='content'>{{name}}</view>
           <view class='declaration'>{{declaration}}</view>
@@ -120,7 +117,7 @@
       </view>
      <view class = 'b'>
       <image class="gps" src="/static/images/address.jpg"></image>
-      <view class='location'>{{scenic}}</view>
+      <view class='location'>{{city}} . {{scenic}}</view>
       <view class='date'>{{dateString}}</view>
      </view>
      <view class = 'c'>第{{number}}个占领者</view>
@@ -128,17 +125,15 @@
         <view class='flex pic-box'>
           <block wx:key="imgbox" wx:for="{{imgbox}}">
             <view class='ap-box'>
-              <view class='add-pic'>
-                <image class='add-pic' src='{{item}}'></image>
-              </view>
+                <image class='add-pic' mode="aspectFit" src='{{item}}'></image>
             </view>
           </block>
         </view>
       </view>
-      <view>
+      <view style='width:100%;align-items: center;'>
         <block wx:if="{{isOwner}}">
           <button class="button" open-type="share">分享给好友</button>
-          <button class="button" @tap="getPost">生成海报</button>
+          <button class="button" style='margin-right:30px;' @tap="getPost">生成海报</button>
         </block>
         <block wx:else>
           <button class="button" open-type="share">分享给好友</button>
@@ -160,6 +155,7 @@
       id:'',
       declaration:'',
       scenic:'',
+      city:'',
       name: '',
       avatar:'',
       dateString:'',
@@ -168,10 +164,15 @@
       isParised:false,
       imgbox:[],
       imageUrl:"/static/images/heart.jpg",
-      parisecount:0
+      parisecount:0,
+      width:'',
+      height:''
     }
     async onLoad(e) {
       console.log(e.traceId);
+      this.width = wepy.getSystemInfoSync().windowWidth*0.3
+      this.height = this.width 
+      console.log(this.height,wepy.getSystemInfoSync().windowHeight)
       if(e.traceId){
         this.id = e.traceId;
       }
@@ -182,6 +183,7 @@
       this.name = trace.name;
       this.avatar = trace.avatar;
       this.scenic = trace.scenic;
+      this.city = trace.city;
       this.declaration = trace.declaration;
       this.parisecount = trace.parisecount;
       this.number = trace.number;
@@ -193,22 +195,28 @@
       if(trace.userId == this.$parent.globalData.user.id){
         this.isOwner = true;
       }
-      const storage = await wepy.getStorage({
-        key:this.$parent.globalData.user.id+this.id
+      let self = this;
+      wx.getStorage({
+        key:this.$parent.globalData.user.id+this.id,
+        success (res){
+          self.imageUrl = "/static/images/zan.jpg";
+          self.isParised = true;
+          self.$apply();
+        },
+        async complete(){
+          self.getImages(e.traceId)
+        }
       })
-      console.log(storage.data)
-      if(storage.data){
-        this.imageUrl = "/static/images/zan.jpg";
-        this.isParised = true;
-      }
-      await this.getImages(e.traceId)
+      
+     // await this.getImages(e.traceId)
     //  await this.reDrawMarker(e.traceId,e.latitude,e.longitude)
+      console.log(this.imageUrl)
       this.$apply();
     }
 
     // 分享
     onShareAppMessage(res) {
-      let title = "我占领了" + this.locationName;
+      let title = "我占领了" + this.city + this.scenic;
       let path = `pages/index`
       return {
         title: title,
@@ -224,11 +232,12 @@
           this.imgbox.push(baseUrl+"/static/image/"+traceId+'/'+result.data.data.images[i]) 
         }
       }
+      this.$apply();
     }
 
     methods = {
       getPost() {
-        wx.navigateTo({url: `/pages/post?traceId=${this.id}&declaration=${this.declaration}&dateString=${this.dateString}&locationName=${this.scenic}`})
+        wx.navigateTo({url: `/pages/post?traceId=${this.id}&declaration=${this.declaration}&dateString=${this.dateString}&locationName=${this.scenic}&city=${this.city}&number=${this.number}`})
       },
       goBack() {
         

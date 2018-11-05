@@ -88,8 +88,8 @@
   }
   .add {
     margin: 20rpx;
-    width: 80px;
-    height: 70px;
+    width: 100%;
+    height: 100%;
   }
   .a{
     margin-top: 20px;
@@ -123,14 +123,19 @@
             </view>
           </block>
           <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
-            <image class='add' src='/static/images/add_pic.jpg'></image>
+            <view wx:if='{{imgbox.length==0}}'>
+              <image style='width:{{width}}px;height:280px' src='/static/images/add_pic.jpg'></image>
+            </view>
+            <view wx:else>
+              <image class='add' src='/static/images/add_pic.jpg'></image>
+            </view>
           </view>
         </view>
       </view>
       <view class='a'>
         <!-- <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active"> -->
           <image class="gps" src="/static/images/address.jpg" style='margin-left:30px'></image>
-          <view style='color:blue;margin-left:5px;display:inline-block'>{{city}}.{{locationName}}</view>
+          <view style='color:#8BC34A;margin-left:5px;display:inline-block'>{{city}}.{{locationName}}</view>
           <view class="weui-cell__ft_in-access selectlocation" @tap='chooseLocation'></view>
         <!-- </navigator> -->
       </view>
@@ -158,11 +163,12 @@
       iconPath:'',
       province:'',
       iconPath:'',
+      width:'',
     //  imageUrl:'/static/images/ic_menu_topic_nor.jpg',
       imgbox:[]
     }
     async onLoad(e) {
-      console.log(e)
+      this.width = wepy.getSystemInfoSync().windowWidth*0.84;
       if(e.latitude && e.longitude){
         this.latitude = e.latitude;
         this.longitude = e.longitude;

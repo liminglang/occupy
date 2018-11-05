@@ -13,8 +13,7 @@
     width: 30px;
   }
   .image {
-    width: 47px;
-    height: 47px;
+    width: 15%;
     border-radius: 50%;
   }
   .content {
@@ -36,7 +35,13 @@
     flex: 1;
     margin-left: 10px;
     display:inline-block;
-    color:#c1c40d
+    color:#8BC34A;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+
   }
   .address-list {
     width: 100%;
@@ -75,7 +80,8 @@
     margin-right: 10px;
   }
   .button{
-    color: aquamarine;
+    background-color:#8BC34A;
+    color:#ffff;
     width: 100%
   }
 </style>
@@ -92,12 +98,12 @@
             <view class='content'>{{item.name}}</view>
             <view class='declaration'>{{item.declaration}}</view>
             <view class = 'b'>
-              <image class="gps" src="/static/images/address.jpg"></image>
-              <view class='location'>{{item.scenic}}</view>
+           <!-- 、   <image class="gps" src="/static/images/address.jpg"></image> -->
+              <view class='location'>{{item.city}} . {{item.scenic}}</view>
             </view>
           </view>
           <view class='b'>
-            <image class="heart" mode="aspectFit" src="/static/images/heart.jpg" @tap='changeParisecount({{item.id}},{{index}})'></image>
+            <image class="heart" mode="aspectFit" src="{{item.imageUrl}}" @tap='changeParisecount({{item.id}},{{index}})'></image>
             <view style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
             <view class='text'>第{{item.number}}个占领者</view>
           </view>
@@ -129,7 +135,7 @@
     data = {
       scenic:'',
       list:[],
-      isParised:false
+      imageUrl:"/static/images/heart.jpg"
     } 
     async onLoad(e) {
       if(e.scenic){
@@ -139,11 +145,29 @@
       //console.log(this.latitude,this.longitude,this.range_x,this.range_y)
       const traces = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
+      let self = this;
       if (traces.data.data) {
-        this.list = traces.data.data;
+        self.list = traces.data.data;
+        for(var i = 0;i<self.list.length;i++){
+          (function(i){
+            wx.getStorage({
+              key:self.$parent.globalData.user.id+String(self.list[i].id),
+              success (res){
+                self.list[i].imageUrl = "/static/images/zan.jpg";
+                self.list[i].isParised = true;
+                self.$apply();
+              },
+              fail (){
+                self.list[i].imageUrl = "/static/images/heart.jpg";
+                self.list[i].isParised = false;
+                self.$apply();
+              }
+            })
+          })(i)
+          
         this.$apply();
+        } 
       }
-      console.log("this.list",this.list)
     }
     methods = {
       startGame() {
@@ -154,15 +178,25 @@
       },
       async changeParisecount(traceId, index){
         console.log("index==========",index)
-        if(this.isParised){
+        if(this.list[index].isParised){
+          console.log("wowwwefewffwfwefwe")
           this.list[index].parisecount--;
-          this.isParised = false;
+          this.list[index].isParised = false;
+          wx.setStorage({
+            key:this.$parent.globalData.user.id + String(this.list[index].id),
+            data:0
+          })
+          this.list[index].imageUrl= "/static/images/heart.jpg"
         }else{
           this.list[index].parisecount++;
-          this.isParised = true;
+          this.list[index].isParised = true;
+          wx.setStorage({
+            key:this.$parent.globalData.user.id + String(this.list[index].id),
+            data:1
+          })
+          this.list[index].imageUrl = "/static/images/zan.jpg"
         }
         this.$apply();
-        console.log(this.list[index].parisecount);
         let url = baseUrl + `/trace/updateTrace?id=${traceId}`
         const setData = {'parisecount': this.list[index].parisecount}
         await req.post(url, setData).catch((err)=>{

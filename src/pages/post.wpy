@@ -70,6 +70,8 @@
     data = {
       declaration:'',
       locationName:'',
+      city:'',
+      number:'',
       nickName: '',
       avatar:'',
       dateString:'',
@@ -84,6 +86,8 @@
       this.locationName = e.locationName;
       this.declaration = e.declaration;
       this.dateString = e.dateString;
+      this.city = e.city;
+      this.number = e.number;
       const self = this
       const ctx = wepy.createCanvasContext('myCanvas');
       const width = wepy.getSystemInfoSync().windowWidth;
@@ -97,8 +101,9 @@
       ctx.setFontSize(14);
       ctx.fillText(this.nickName,105,35);
       ctx.fillText(this.declaration,90,65);
-      ctx.fillText(this.dateString,15, height-80);
-      ctx.fillText(this.locationName,30, height-40);
+      ctx.fillText(this.dateString,30, height-70);
+      ctx.fillText(this.city + ' . '+ this.locationName,30, height-45);
+      ctx.fillText("第"+this.number + '个占领者',30,height-20)
       ctx.save();
       ctx.restore();
       ctx.beginPath()
@@ -114,7 +119,8 @@
       ctx.arc(width-70, height-45, 40, 0, 2 * Math.PI);
      // ctx.stroke();
       ctx.clip();
-      ctx.drawImage(this.avatar, 10, 10, 70, 70);
+      let avatar = await wepy.downloadFile({url:this.avatar}); 
+      ctx.drawImage(avatar.tempFilePath, 10, 10, 70, 70);
       ctx.drawImage("/static/images/qrcode.jpg", width-110, height-85, 80, 80);
       ctx.save()
       ctx.draw(true, async ()=>{

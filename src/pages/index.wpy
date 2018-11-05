@@ -57,7 +57,7 @@
 <script>
   import wepy from 'wepy'
   import 'wepy-async-function'
-  import { baseUrl, appId} from '@/config'
+  import { baseUrl, appId,txMapsKey} from '@/config'
   import req from '@/network'
   import _ from 'underscore'
   export default class Index extends wepy.page {
@@ -74,20 +74,68 @@
       const result = await wepy.getSystemInfo();
       this.height = wepy.getSystemInfoSync().windowHeight
       this.width = wepy.getSystemInfoSync().windowWidth
-      const location = await wepy.getLocation({
-        type: 'gcj02'
-      });
-      this.latitude = location.latitude;
-      this.longitude = location.longitude;
-      await this.initMarkers();
-      this.mapCtx = wx.createMapContext('map'); 
-      this.mapCtx.moveToLocation();
-      if(this.isDisplay){
-        await this.getTraces();
-      }
-     this.isOnload = true
-     this.$apply();
+      let self = this;
+      wx.getLocation({
+        type: 'gcj02',
+        async success (res) {
+          self.latitude = res.latitude
+          self.longitude = res.longitude
+          self.$apply();
+          await self.initMarkers();
+          self.mapCtx = wx.createMapContext('map'); 
+          self.mapCtx.moveToLocation();
+          if(self.isDisplay){
+            await self.getTraces();
+          }
+          self.isOnload = true
+          self.$apply(); 
+        },
+        fail (err) {
+          wx.getSetting({
+            success (res){
+              if (!res.authSetting['scope.userLocation']){
+                wx.showModal({
+                  title: '是否授权当前位置',
+                  content: '需要获取您的地理位置，请确认授权，否则地图功能将无法使用',
+                  success (tip) {
+                    if (tip.confirm) {
+                      wx.openSetting({
+                        success (data) {
+                          if (data.authSetting["scope.userLocation"] === true) {
+                            wx.showToast({
+                              title: '授权成功',
+                              icon: 'success',
+                              duration: 1000
+                            })
+                            wx.getLocation({
+                              type: 'gcj02',
+                              async success (res) {
+                                self.latitude = res.latitude
+                                self.longitude = res.longitude
+                                self.$apply(); 
+                                await self.initMarkers();
+                                self.mapCtx = wx.createMapContext('map'); 
+                                self.mapCtx.moveToLocation();
+                                if(self.isDisplay){
+                                  await self.getTraces();
+                                }
+                                self.isOnload = true
+                                self.$apply(); 
+                              }
+                            })
+                          }           
+                        }
+                      })
+                    }
+                  }
+                })
+              }
+            }
+          })
+        }
+      })
     }
+ 
     afterOccupy(iconPath){
       this.markers[0]= {};
     //  let traceIds = []
@@ -106,12 +154,9 @@
      //     traceIds:traceIds
         })
       }
-      console.log("iconPath====",iconPath)
-      console.log("onshow============",this.markers)
       this.$apply();
     }
     async onShow() {
-      
     }
 
     data = {
@@ -121,6 +166,7 @@
       scale:16,
       latitude: 0,
       longitude: 0,
+      scenic:'',
       markers: [],
       controls: [],
       range_x: 0,
@@ -140,6 +186,8 @@
       if(e.markerId == 0){
         wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
       }else{
+        console.log(e.markerId);
+        console.log(this.markers)
         if(this.markers[e.markerId].traceIds.length==1){
           wx.navigateTo({url: `/pages/traceshow?traceId=${this.markers[e.markerId].traceIds[0]}`})
         }else{
@@ -166,10 +214,25 @@
       });
       console.log("region======",this.range_x,this.range_y)
     }
+    async getCityNameFromTX(latitude, longitude) {
+      const url = `https://apis.map.qq.com/ws/geocoder/v1/?location=${latitude},${longitude}&key=${txMapsKey}`;
+      const res = await wepy.request({url: url, method: 'GET'}).catch((err)=>{
+        console.log("error...",err.data);
+        return {}
+      });
+      if(!this.scenic) {
+        if(res.data.result.address_reference.famous_area){
+          this.scenic = res.data.result.address_reference.famous_area.title;
+        }else{
+          this.scenic = res.data.result.address_reference.landmark_l2.title;
+        }
+      }
+      this.$apply(); 
+    }
     async initMarkers(){
       this.markers = []
-      console.log("初始化之前",this.markers)
-      let url = baseUrl + `/trace/isOccupied?latitude=${this.latitude}&longitude=${this.longitude}&userId=${this.$parent.globalData.user.id}`;
+      await this.getCityNameFromTX(this.latitude,this.longitude)
+      let url = baseUrl + `/trace/isOccupied?scenic=${this.scenic}`;
       const result = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
       if(result.data.data.traces){
@@ -288,20 +351,7 @@
             canvasId: 'myCanvas',
             fileType: 'jpeg',
           });
-          // if(markers[j].name=='市政府'){
           markers[j]['iconPath'] = res.tempFilePath
-          // const saveRes = await wepy.saveImageToPhotosAlbum({
-          //   filePath: res.tempFilePath
-          // }).catch((err)=>{
-          //   return false;
-          // });
-          // console.log("saveRes=============",saveRes)
-          // if(saveRes){
-          //   wepy.showToast({
-          //     title: "已保存至相册",
-          //     icon: "none"
-          //   });
-          // }
         }
         self.markers = markers;
         self.$apply();
@@ -310,7 +360,7 @@
     async occupy() {
       if (!this.isAuth){
         wx.showToast({
-          title: '请先授权',
+          title: '请先授权用户信息',
           icon:'none'})
       }else{
         wx.navigateTo({url: `/pages/occupy?latitude=${this.latitude}&longitude=${this.longitude}`})
@@ -331,6 +381,8 @@
               console.log("updateAvatarError...", err.data)})
             this.$parent.globalData.user.name = info.userInfo.nickName;
             this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
+            this.isAuth = true;
+            this.$apply();
           }
         }
         else{
