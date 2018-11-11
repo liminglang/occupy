@@ -1,75 +1,146 @@
 <style lang="less">
-  .startbutton {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.roundedRectangle{
+  border:1px solid #939393;
+  height:60%;
+  width:95%;
+  border-radius:8px;
+  margin:2.5%;
+}
   .button {
-    display:inline;
-    background-color: #44dd15;
-    margin-left: 200px;
-  }
+    width:25%;
+    background:#019B79;
+    border-radius:35px;
+    color:#ffff;
+    font-size:13px;
+    position:fixed;
+    top:3%;
+    left:70%;
+
+}
   .content {
-    flex: 1;
-    margin-left: 10px;
-    text-overflow:ellipsis;
-  }
-  .gps {
-    height: 30px;
-    width: 30px;
+    margin-left:10%;
+    font-size:12pt;
+    color:#939393;
+    margin-top:3%;
+    display: flex;
+    height:7%;
   }
    .flex {
     display:flex;
   }
   .up-pic {
-    width: 90%;
-    height: 300px;
+    width:90%;
+    height:100%;
     margin:0 auto;
-    justify-content: center;
-    border:1px solid #EBEBEB; 
+    justify-content:center;
+    border:1px solid #EBEBEB
   }
   .pic-box{  
-    margin-top:5rpx;  
-    flex-flow:wrap;  
-    width:95%;   
+    width:90%;
+    height:50%;
+    margin:0 auto;
   } 
   .ap-box{  
-    position: relative;  
+    position: relative;
+    width:30%;
+    height:100%;
   }
   .add-pic{  
-    width: 160rpx;  
-    height: 160rpx;  
-    margin-right: 20rpx;  
-    position: relative;  
-    margin: 15rpx 10rpx 20rpx 30rpx; 
+    width:100%;
+    height:80%;
   } 
   .img-de{  
-    width:45rpx;  
-    height:45rpx;  
+    width:20px;  
+    height:20px;  
     border-radius:50%;  
     position:absolute;  
     right:-41rpx;  
     top:5rpx;  
   }
-  .hong-contant .teamwork-btn{
-    width: 360rpx;
-    height: 88rpx; 
-    border-radius: 50rpx;
-    color: white; 
-    background-color:#14a1fd; 
-    margin: 0 auto;
-    margin-top: 80rpx;
-    margin-bottom: 40rpx;
-  }
   .add {
-    margin: 20rpx;
-    width: 80px;
-    height: 70px;
+    margin: 5%;
+    height: 100%;
+    width: 90%;
+  }
+  .delete{
+    width: 20px;
+    height: 20px;
+  }
+  .a{
+    position:fixed;
+    top:3%;
+    left:10%;
+    width:100%;
+  }
+  .b{
+    color:#01644F;
+    font-size:14pt;
+  }
+  .c{
+    color: #019B79;
+    position:fixed;
+    top:12%;
+    left:10%;
+  }
+  .text{
+    background-color:#CCEBE5;
+    width:60%;
+    font-size:12px;
+    //color:#019B79;
+    position:fixed;
+    top:12%;
+    left:35%;
+    height:6%;
+    border-radius:8px;
+    border:1px solid;
+  }
+  .d{
+    position:fixed;
+    color: #019B79;
+    top:22%;
+    left:10%;
+  }
+  .date{
+    background-color:#CCEBE5;
+    width:60%;
+    font-size:12px;
+   // color:#019B79;
+    position:fixed;
+    top:22%;
+    left:35%;
+    height:6%;
+    border-radius:8px;
+    border:1px solid;
+  }
+  .e{
+    width:90%;
+    height:25%;
+    position:fixed;
+    top:28%;
+    margin-left:10%;
+
+  }
+  .f{
+    color:#01644F;
+    font-size:14pt;
+    margin-left: 10%;
+  }
+  .button2{
+    width:20%;
+    background:#ffff;
+    border-radius:35px;
+    font-size:13px;
+    margin-left:20%;
+    border:1px solid #019B79;
+    height:70%;
   }
 </style>
 <template>
-    <view>
-      <view>新增足迹<button class='button' @tap="confirm">完成</button>
+    <view style='height:{{height}}px;width:{{width}}'>
+      <view class = 'roundedRectangle'></view>
+      <view class = 'a'>
+        <view class = 'b'>新增足迹</view>
+        <button class='button' @tap="confirm">完成</button>
       </view>
       <!-- <view class="weui-cell weui-cell_input">
         <view class="weui-cell__hd">
@@ -81,56 +152,48 @@
           </picker>
         </view>
       </view> -->
-      <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label">地点名称：</view>
-        </view>
-        <view class="weui-cell__bd">
-          <view class="weui-input" @tap='searchLocation'>{{scenic}}</view>
-          <!-- <input class="weui-input" value="{{scenic}}" bindfocus='searchLocation'/> -->
-        </view>
+      <view class="c">地点名称
+        <input value="{{scenic}}" class='text' @tap='searchLocation'>
       </view>
-      <view class="weui-cell weui-cell_input">
-        <view class="weui-cell__hd">
-          <view class="weui-label">游玩日期:</view>
-        </view>
-        <view class="weui-cell__bd">
-          <picker mode="date" bindchange="bindDateChange" value="{{date}}">
-            <view class="weui-input" placeholder="选择到哪的时间">{{date}}</view>
-          </picker>
-        </view>
+      <view class="d">游玩日期
+        <picker mode="date" bindchange="bindDateChange" value="{{date}}" class = 'date'>
+          <view class="weui-input" placeholder="选择到哪的时间" style='margin-left:10px;'>{{date}}</view>
+        </picker>
       </view>
-      <view class='up-pic'>
-        <view class='flex pic-box'>
-          <block wx:key="imgbox" wx:for="{{imgbox}}">
-            <view class='ap-box'>
-              <view class='add-pic'>
-                <image class='add-pic' src='{{item}}'></image>
-                  <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
-                    <image class='gps' src='/static/images/close_pic.jpg'></image>
+      <view class='e' wx:if='{{imgbox.length==0}}'>
+          <image class='add' mode='aspectFit' src='/static/images/add_pic.jpg' bindtap='uploadPhoto'></image>
+        </view>
+        <view class='e' wx:else>
+            <view class='add'>
+              <block wx:key="imgbox" wx:for="{{imgbox}}">
+                <view class='ap-box'>
+                  <view class='add-pic'>
+                    <image class='add-pic' src='{{item}}'></image>
+                    <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
+                      <image class='delete' src='/static/images/close_pic.jpg'></image>
+                    </view>
                   </view>
-              </view>
+                </view>
+              </block>
+              <image class='add-pic'  mode='aspectFill' bindtap='uploadPhoto' wx:if="{{imgbox.length<6}}" src='/static/images/add_pic.jpg'></image>
             </view>
-          </block>
-          <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<9}}">
-            <image class='add' src='/static/images/add_pic.jpg'></image>
-          </view>
         </view>
-      </view>
-      <view>隐藏足迹</view>
+      <view class='f'>隐藏足迹</view>
       <repeat for="{{list}}" key="index" index="index" item="item">
-        <view class="weui-cell">
           <block wx:if='{{item.isshow}}'>
-            <view class='content'>{{item.dateString}},{{item.city}},{{item.scenic}}
-              <button class='button' @tap='hideTrace({{index}})'>隐藏</button>
+            <view class='content' style='color:#019B79;'>
+              <view>{{item.dateString}}</view>
+              <view style='margin-left:5%'>{{item.city}}.{{item.scenic}}</view>
+              <button class='button2' @tap='hideTrace({{index}})'>隐藏</button>
             </view>
           </block>
           <block wx:else>
-            <view class='content' style='color:#C0C0C0'>{{item.dateString}},{{item.city}},{{item.scenic}}
-              <button class='button' @tap='hideTrace({{index}})'>显示</button>
+            <view class='content'>
+              <view>{{item.dateString}}</view>
+              <view style='margin-left:5%;'>{{item.city}}.{{item.scenic}}</view>
+              <button class='button2' @tap='hideTrace({{index}})'>显示</button>
             </view>
           </block>
-        </view>
       </repeat>
     </view>   
 </template>
@@ -142,18 +205,21 @@
   import qqmapwx from '../map/qqmap-wx-jssdk.js'
   export default class Edittrace extends wepy.page {
     config = {
-      navigationBarTitleText: '足迹占领'
-    }
+        navigationBarTitleText: '我的足迹',
+        navigationBarBackgroundColor:'#019B79'
+    };
     data = {
-      date:'',
+      date:'     选择具体时间',
       imgbox:[],
       latitude:'',
       longitude:'',
       province:'',
-      scenic:'',
+      scenic:'   可选输入',
       city:'',
       list:[],
-      buttonContent:''
+      buttonContent:'',
+      height:wepy.getSystemInfoSync().windowHeight,
+      width:wepy.getSystemInfoSync().windowWidth
     }
     bindDateChange(e) {
       this.date = e.detail.value;
@@ -189,39 +255,30 @@
       },
       async uploadPhoto(e){
         let self = this;
-        wx.showActionSheet({
-          itemList: ['从相册中选择', '拍照'],
-          success: async (res)=> {
-            if (!res.cancel) {
-              var imgbox = self.imgbox;
-              console.log(imgbox)
-              var picid = e.currentTarget.dataset.pic;
-              console.log(picid)
-              var that = this;
-              var n = 9;
-              if (9 > imgbox.length > 0) {
-                n = 9 - imgbox.length;
-              } else if (imgbox.length == 9) {
-                n = 1;
-              }
-              const res = await wepy.chooseImage({
-                count: n,
-                sizeType: ['original', 'compressed'],
-                sourceType: ['album', 'camera']
-              })
-              if (imgbox.length == 0) {
-                imgbox = res.tempFilePaths
-              } else if (9 > imgbox.length) {
-                imgbox = imgbox.concat(res.tempFilePaths);
-              } else {
-                imgbox[picid] = res.tempFilePaths[0];
-              }
-              self.imgbox = imgbox;
-              self.$apply();
-            }
-          }
+        var imgbox = self.imgbox;
+        console.log(imgbox)
+        var picid = e.currentTarget.dataset.pic;
+        console.log(picid)
+        var n = 9;
+        if (9 > imgbox.length > 0) {
+          n = 9 - imgbox.length;
+        } else if (imgbox.length == 9) {
+          n = 1;
+        }
+        const res = await wepy.chooseImage({
+          count: n,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['camera','album']
         })
-        this.$apply();
+        if (imgbox.length == 0) {
+          imgbox = res.tempFilePaths
+        } else if (9 > imgbox.length) {
+          imgbox = imgbox.concat(res.tempFilePaths);
+        } else {
+          imgbox[picid] = res.tempFilePaths[0];
+        }
+        self.imgbox = imgbox;
+        self.$apply();
       },
       
       imgDelete(e){

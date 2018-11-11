@@ -9,118 +9,262 @@
     
   }
   .gps {
-    height: 30px;
-    width: 30px;
+    height:15px;
+    width:15px;
+
   }
   .image {
     width: 15%;
     border-radius: 50%;
   }
-  .content {
-    flex: 1;
-    margin-left: 10px;
-    text-overflow:ellipsis;
-    margin-bottom:10px;
+  .a{
+    margin: 5%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 12%;
+    width: 100%;
   }
-  .declaration {
+ 
+.add {
+    margin:2%;
+    height:30%;
+    width:96%;
+    position:fixed;
+    top:1%;
+  }
+  .two_text {
+    display:2%;
+    margin-left:3%;
+    width:50%;
+
+  }
+ .two_heart{
+    display:inline-block;
+    width:5%;
+    margin-left:3%;
+    height:35%;
+  }
+  .two_avatar {
+    border-radius: 50%;
+    margin-left:2%;
+
+  }
+  .two_a{
+    margin: 5%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 12%;
+    width: 100%;
+    position:fixed;
+    top:1.5%;
+
+  }
+  .two_content {
+    flex:1;
+    margin-left:3%;
+    text-overflow:ellipsis;
+    margin-bottom:3%;
+    color:#019B79;
+    font-size:13pt;
+  }
+  .two_declaration {
     flex: 1;
-    width: 150px;
+    width: 100%;
     margin-left: 10px;
     text-overflow:ellipsis;
     overflow: hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
+    color:#939393;
+    font-size:10pt;
+    margin-top:-5px;
   }
-  .location{
-    flex: 1;
-    margin-left: 10px;
-    display:inline-block;
-    color:#8BC34A;
-    display: -webkit-box;
-    text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
-
-  }
-  .address-list {
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 31.25rpx;
-    background: #fff
-      url(http://yanxuan.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/address-bg-bd30f2bfeb.png)
-      0 0 repeat-x;
-    background-size: auto 10.5rpx;
-    margin-bottom: 90rpx;
-  }
-  .text {
-    display:inline-block;
-    margin-left: 10px;
-    margin-bottom:20px;
-  }
- .heart{
-    display:inline-block;
-    margin-right: 10px;
-    height: 25px;
-    width: 25px;
-    margin-left: 20px;
-  }
-  .slogon {
-    width: 100%;
+  .order{
+    color:#939393;
+    font-size:10pt;
+    position:fixed;
+    top:18%;
     text-align:center;
+    width:100%;
+  }
+  .confirm {
+    width:50%;
+    background:#019B79;
+    border-radius:35px;
+    color:#ffff;
+    font-size:12px;
+    margin-top:10%;
+    position:fixed;
+    top:18%;
+    margin-left:25%;
+  }
+  .modal-mask {
+    width: 100%;
+    height: 20%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: 0.5;
+    overflow: hidden;
+    z-index: 9000;
+    color: #fff;
+  }
+
+.modal-dialog {
+  width: 100%;
+  height: 80%;
+  overflow: hidden;
+  position: fixed;
+  top: 20%;
+  // left: 2.5%;
+  z-index: 9999;
+  background: #f9f9f9;
+  //margin: -180rpx 105rpx;
+  border-radius: 10rpx;
+}
+.close{
+  width:5%;
+  height: 5%;
+  position: fixed;
+  top: 19%;
+  left: 95%;
+}
+.two_up-pic {
+    width:90%;
+    height:100%;
+    margin:0 auto;
+    justify-content:center;
+    border:1px solid #EBEBEB
+  }
+  .two_pic-box{  
+    width:90%;
+    height:50%;
+    margin:0 auto;
+  } 
+  .two_ap-box{  
+    position: relative;
+    width:30%;
+    height:100%;
+  }
+  .two_add-pic{  
+    width:100%;
+    height:80%;
+  }
+.date{
+    color:#939393;
+    font-size:10pt;
+    margin-left:25%;
+  }
+  .c{
+    color:#019B79;
+    font-size:13pt;
+    margin-left:40%;
+    margin-top:3%;
+    display:flex;
+    width:100%
   }
   .a{
-    margin-top: 20px;
+    margin: 5%;
     display: flex;
     flex-direction: row;
     align-items: center;
-  }
-  .b{
-    display:inline-block;
-    margin-right: 10px;
+    height: 12%;
+    width: 100%;
   }
   .button{
-    background-color:#8BC34A;
+    width:50%;
+    background:#019B79;
+    border-radius:35px;
     color:#ffff;
-    width: 100%
+    font-size:12px;
+    margin-left:35%;
   }
 </style>
 <template>
-  <view>
-    <view class='slogon'>获赞数越多排序越靠前,快邀请好友助力吧！</view>
-    <button class="button" open-type="share">邀请好友助力</button>
-    <repeat for="{{list}}" key="index" index="index" item="item">
-      <view class="list">
-        <view class="a">
-          <view style='margin-left:5px;margin-right:5px'>{{index+1}}</view>
-          <image class="image" mode="aspectFit" src="{{item.avatar}}" @tap='showTrace({{item.id}})'></image>
-          <view class='text'>
-            <view class='content'>{{item.name}}</view>
-            <view class='declaration'>{{item.declaration}}</view>
-            <view class = 'b'>
-           <!-- 、   <image class="gps" src="/static/images/address.jpg"></image> -->
-              <view class='location'>{{item.city}} . {{item.scenic}}</view>
+  <view style='height:{{height}}px;width:{{width}}'>
+    <!-- <view class='slogon'>获赞数越多排序越靠前,快邀请好友助力吧！</view> -->
+    <image class='add' src='/static/images/card.png'></image>
+    <view class="two_a">
+      <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{list[index].avatar}}"></image>
+      <view class='two_text'>
+        <view class='two_content'>{{name}}</view>
+        <view class='two_declaration'>{{list[index].declaration}}</view>
+        <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
+        <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{list[index].city}}.{{list[index].scenic}}</view>
+      </view>
+      <image class="two_heart" mode="aspectFit" src="{{list[index].imageUrl}}" @tap='changeParisecount({{id}},{{index}})'></image>
+      <view wx:if="{{list[index].parisecount}}" style='display:inline-block;margin-left:5px;'>{{list[index].parisecount}}</view>
+    </view>
+    <view class='order'>占领此处排名  {{list[index].number}}</view>
+    <button class='confirm' open-type="share">邀请好友助力</button>
+    
+    <repeat for="{{list}}" key="index" index="index" item="item" style='height:70%'>
+      <view wx:if='{{index<showCount}}' style='height:25%'>
+          <view class="a">
+            <view wx:if='{{index==0}}'>
+              <image style='width:30px' mode="aspectFit" src="/static/images/n1.png"></image>
             </view>
+            <view wx:if='{{index==1}}'>
+              <image style='width:30px' mode="aspectFit" src="/static/images/n2.png"></image>
+            </view>
+            <view wx:if='{{index==2}}'>
+              <image style='width:30px' mode="aspectFit" src="/static/images/n3.png"></image>
+            </view>
+            <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{item.avatar}}" @tap='showModal({{index}})'></image>
+            <view class='two_text'>
+              <view class='two_content'>{{name}}</view>
+              <view class='two_declaration'>{{item.declaration}}</view>
+              <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
+              <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{item.city}}.{{item.scenic}}</view>
+            </view>
+            <image class="two_heart" mode="aspectFit" style='height:20px;' src="{{item.imageUrl}}" @tap='changeParisecount({{item.id}},{{index}})'></image>
+            <view wx:if="{{item.parisecount}}" style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
           </view>
-          <view class='b'>
-            <image class="heart" mode="aspectFit" src="{{item.imageUrl}}" @tap='changeParisecount({{item.id}},{{index}})'></image>
-            <view style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
-            <view class='text'>第{{item.number}}个占领者</view>
-          </view>
-        </view>
       </view>
     </repeat>
-  </view>
-    <!-- <view class="weui-cell">
-      <navigator url="/pages/location"  class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-        <view class="weui-cell__hd">
-          <image class="gps" src="/static/images/address.png"></image>
+    <cover-view class="modal-mask" @tap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></cover-view>
+    <view class="modal-dialog" wx:if="{{showModal}}">
+        <image class='close' mode='aspectFit' src='/static/images/close_pic.jpg' bindtap='closeModal'></image>
+        <view class="a">
+          <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{list[index].avatar}}"></image>
+          <view class='two_text'>
+            <view class='two_content'>{{list[index].name}}</view>
+            <view class='two_declaration'>{{list[index].declaration}}</view>
+          </view>
+          <image class="two_heart" mode="aspectFit" src="{{list[index].imageUrl}}" @tap='changeParisecount({{id}},{{index}})'></image>
+          <view wx:if="{{list[index].parisecount}}" style='display:inline-block;margin-left:5px;'>{{list[index].parisecount}}</view>
         </view>
-        <view class="name" style='color:#c1c40d'>{{locationName}}</view>
-        <view class='name' style='margin-right:20px'>{{dateString}}</view>
-      </navigator>
-    </view>
-  </view> -->
+        <view class = 'c'>
+          <view style='font-size:10pt'>第</view>
+          <view style='font-size:16pt'>{{list[index].number}}</view>
+          <view style='font-size:10pt'>个占领此处</view>
+        </view>
+        <view style='width:100%;height:40%;margin-top:2%'>
+          <view class='two_up-pic'>
+            <view class='flex two_pic-box'>
+              <block wx:key="imgbox" wx:for="{{imgbox}}">
+                <view class='two_ap-box'>
+                    <image class='two_add-pic' mode="aspectFit" src='{{item}}' @tap="previewImage({{item}})"></image>
+                </view>
+              </block>
+            </view>
+          </view>
+        </view>
+        <view class='a' style='margin-top:5%'>
+          <!-- <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active"> -->
+          <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
+          <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{list[index].city}}.{{list[index].scenic}}</view>
+          <view class='date'>{{dateString}}</view>
+        </view>
+        <view style='width:100%;align-items: center; display:flex'>
+          <button class="button" style='width:30%;' open-type="share">分享给好友</button>
+        </view>
+      </view>
+
+  </view> 
 </template>
 <script>
   import wepy from 'wepy'
@@ -130,24 +274,47 @@
   import _ from 'underscore'
   export default class Tracelist extends wepy.page {
     config = {
-      navigationBarTitleText: '足迹占领'
+      navigationBarTitleText: '占领者',
+      navigationBarBackgroundColor:'#019B79'
     }
     data = {
+      id:'',
       scenic:'',
       list:[],
-      imageUrl:"/static/images/heart.jpg"
+      imageUrl:"/static/images/heart.jpg",
+      imgbox:[],
+      width:0,
+      height:0,
+      isOccupied:false,
+      isParised:false,
+      index:0,
+      avatar_height:0,
+      name:'',
+      dateString:'',
+      imageUrl:"/static/images/heart.jpg",
+      showCount:3,
+      moreButton:false,
+      showModal:false
     } 
     async onLoad(e) {
-      if(e.scenic){
-        this.scenic = e.scenic;
-      }
-      let url = baseUrl + `/trace/getList?latitude=${e.latitude}&longitude=${e.longitude}`;
+      this.height = wepy.getSystemInfoSync().windowHeight
+      this.width = wepy.getSystemInfoSync().windowWidth
+      this.avatar_height = this.width*0.17;
+      this.name = this.$parent.globalData.user.name;
+      let url = baseUrl + `/trace/getList?traceIds=${e.traceIds}`;
       //console.log(this.latitude,this.longitude,this.range_x,this.range_y)
       const traces = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
       let self = this;
       if (traces.data.data) {
         self.list = traces.data.data;
+        const userIds = _.pluck(self.list,'userId')
+        let index = _.indexOf(userIds,this.$parent.globalData.user.id)
+        this.id = self.list[index].id;
+        if(index>-1){
+          self.isOccupied = true;
+          self.index = index;
+        }
         for(var i = 0;i<self.list.length;i++){
           (function(i){
             wx.getStorage({
@@ -164,10 +331,34 @@
               }
             })
           })(i)
-          
+        }
+        if(this.list.length>3){
+          this.showCount = 3
+          this.moreButton = ture;
+        }else{
+          this.showCount = this.list.length
+        }
         this.$apply();
-        } 
       }
+      wx.getStorage({
+        key:this.$parent.globalData.user.id+ String(this.list[this.index].id),
+        success (res){
+          self.imageUrl = "/static/images/zan.jpg";
+          self.isParised = true;
+          self.$apply();
+        }
+      })
+    }
+    async getImages(traceId){
+      let url = baseUrl + `/image/get?traceId=${traceId}`;
+      const result = await req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      if(result.data.data.imageCount){
+        for(var i=0;i<result.data.data.imageCount;i++){
+          this.imgbox.push(baseUrl+"/static/image/"+traceId+'/'+result.data.data.images[i]) 
+        }
+      }
+      this.$apply();
     }
     methods = {
       startGame() {
@@ -201,6 +392,29 @@
         const setData = {'parisecount': this.list[index].parisecount}
         await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
+      },
+      more(){
+        this.showCount = this.list.length;
+        this.moreButton = false;
+      },
+      showModal(index){
+        this.showModal = true;
+        let date  = new Date(this.list[index].created*1000);
+        let year = date.getFullYear();
+        let month = date.getMonth()+1;
+        let day = date.getDate();
+        this.dateString = year + '.' + month + '.' + day;
+        this.id = this.list[index].id;
+        this.getImages(this.id);
+        this.$apply();
+      },
+      closeModal(){
+        this.showModal = false;
+        this.$apply();
+      },
+      hideModal(){
+        this.showModal = false;
+        this.$apply();
       }
     }
   }

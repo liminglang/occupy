@@ -1,38 +1,4 @@
 <style lang="less">
-  .startbutton {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .weui-textarea-input{
-      display:block;
-      width:100%;
-    }
-  .text {
-    width:90%;
-    height: 100px;
-    min-height:24px;
-    background-color:#FFF;
-    border-radius:5px 5px;
-    overflow-y:auto;
-    font-size:0.9em;
-    align-content:center;
-    margin-left:15px;
-    margin-right:40px;
-    margin-top:10px;
-  }
-  .photo {
-    margin-top: 20px;
-    width:60%;
-    height:150px;
-    margin-left: auto; margin-right: auto;
-    border:solid 1px #000;
-  }
-  .cross {
-    height: 30px;
-    width: 30px;
-    margin-top: 60px;
-  }
   .confirm {
     height: 30px;
     width: 100%;
@@ -75,16 +41,6 @@
     position:absolute;  
     right:-41rpx;  
     top:5rpx;  
-  }
-  .hong-contant .teamwork-btn{
-    width: 360rpx;
-    height: 88rpx; 
-    border-radius: 50rpx;
-    color: white; 
-    background-color:#14a1fd; 
-    margin: 0 auto;
-    margin-top: 80rpx;
-    margin-bottom: 40rpx;
   }
   .add {
     margin: 20rpx;
@@ -164,7 +120,6 @@
       province:'',
       iconPath:'',
       width:'',
-    //  imageUrl:'/static/images/ic_menu_topic_nor.jpg',
       imgbox:[]
     }
     async onLoad(e) {
@@ -179,7 +134,7 @@
       if(e.imgbox){
         this.imgbox = e.imgbox.split(',')
       }
-    //  this.content = this.$parent.globalData.user.name +'到此一游！';
+      this.content = this.$parent.globalData.user.name +'到此一游！';
       await this.getCityNameFromTX(e.latitude,e.longitude);
       await this.reDrawMarker(e.latitude,e.longitude);
       this.$apply();
@@ -284,39 +239,30 @@
       
       async uploadPhoto(e){
         let self = this;
-        wx.showActionSheet({
-          itemList: ['从相册中选择', '拍照'],
-          success: async (res)=> {
-            if (!res.cancel) {
-              var imgbox = self.imgbox;
-              console.log(imgbox)
-              var picid = e.currentTarget.dataset.pic;
-              console.log(picid)
-              var that = this;
-              var n = 9;
-              if (9 > imgbox.length > 0) {
-                n = 9 - imgbox.length;
-              } else if (imgbox.length == 9) {
-                n = 1;
-              }
-              const res = await wepy.chooseImage({
-                count: n,
-                sizeType: ['original', 'compressed'],
-                sourceType: ['album', 'camera']
-              })
-              if (imgbox.length == 0) {
-                imgbox = res.tempFilePaths
-              } else if (9 > imgbox.length) {
-                imgbox = imgbox.concat(res.tempFilePaths);
-              } else {
-                imgbox[picid] = res.tempFilePaths[0];
-              }
-              self.imgbox = imgbox;
-              self.$apply();
-            }
-          }
+        var imgbox = self.imgbox;
+        console.log(imgbox)
+        var picid = e.currentTarget.dataset.pic;
+        console.log(picid)
+        var n = 9;
+        if (9 > imgbox.length > 0) {
+          n = 9 - imgbox.length;
+        } else if (imgbox.length == 9) {
+          n = 1;
+        }
+        const res = await wepy.chooseImage({
+          count: n,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['camera','album']
         })
-        this.$apply();
+        if (imgbox.length == 0) {
+          imgbox = res.tempFilePaths
+        } else if (9 > imgbox.length) {
+          imgbox = imgbox.concat(res.tempFilePaths);
+        } else {
+          imgbox[picid] = res.tempFilePaths[0];
+        }
+        self.imgbox = imgbox;
+        self.$apply();
       },
       
       imgDelete(e){
@@ -357,7 +303,7 @@
         }
         var page = getCurrentPages()[0];
         if (page == undefined || page == null) return;
-        page.afterOccupy(this.iconPath);
+        page.afterOccupy(result.data.data.traceId,this.iconPath);
         wx.navigateTo({url: `/pages/traceshow?traceId=${result.data.data.traceId}&latitude=${this.latitude}&longitude=${this.longitude}`})
       }
     }

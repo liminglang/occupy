@@ -125,7 +125,7 @@
         <view class='flex pic-box'>
           <block wx:key="imgbox" wx:for="{{imgbox}}">
             <view class='ap-box'>
-                <image class='add-pic' mode="aspectFit" src='{{item}}'></image>
+                <image class='add-pic' mode="aspectFit" src='{{item}}' @tap="previewImage({{item}})"></image>
             </view>
           </block>
         </view>
@@ -239,8 +239,11 @@
       getPost() {
         wx.navigateTo({url: `/pages/post?traceId=${this.id}&declaration=${this.declaration}&dateString=${this.dateString}&locationName=${this.scenic}&city=${this.city}&number=${this.number}`})
       },
-      goBack() {
-        
+      previewImage(imageUrl){
+        wx.previewImage({
+          current: imageUrl, // 当前显示图片的http链接
+          urls: this.imgbox // 需要预览的图片http链接列表
+        })
       },
       async changeParisecount(traceId){
         if(this.isParised){
