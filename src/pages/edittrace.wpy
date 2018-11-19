@@ -1,7 +1,7 @@
 <style lang="less">
 .roundedRectangle{
   border:1px solid #939393;
-  height:60%;
+  height:65%;
   width:95%;
   border-radius:8px;
   margin:2.5%;
@@ -21,46 +21,48 @@
     margin-left:10%;
     font-size:12pt;
     color:#939393;
-    margin-top:3%;
+    margin-top:5%;
     display: flex;
-    height:7%;
+    height:50px;
   }
-   .flex {
+  .flex {
     display:flex;
   }
   .up-pic {
-    width:90%;
-    height:100%;
+    width: 90%;
+    height: 45%;
     margin:0 auto;
-    justify-content:center;
-    border:1px solid #EBEBEB
+    justify-content: center;
+    border:1px solid #EBEBEB;
   }
   .pic-box{  
-    width:90%;
-    height:50%;
-    margin:0 auto;
+    margin-top:5rpx;  
+    flex-flow:wrap;  
+    width:95%;   
   } 
   .ap-box{  
-    position: relative;
-    width:30%;
-    height:100%;
+    position: relative;  
   }
   .add-pic{  
-    width:100%;
-    height:80%;
+    width: 160rpx;  
+    height: 160rpx;  
+    margin-right: 20rpx;  
+    position: relative;  
+    margin: 15rpx 20rpx 20rpx 30rpx; 
   } 
   .img-de{  
-    width:20px;  
-    height:20px;  
+    width:45rpx;  
+    height:45rpx;  
     border-radius:50%;  
     position:absolute;  
     right:-41rpx;  
     top:5rpx;  
   }
   .add {
-    margin: 5%;
     height: 100%;
     width: 90%;
+    display: flex;
+    margin-left: 5%;
   }
   .delete{
     width: 20px;
@@ -114,11 +116,11 @@
   }
   .e{
     width:90%;
-    height:25%;
+    height:31%;
     position:fixed;
     top:28%;
-    margin-left:10%;
-
+    margin-left:5%;
+    margin-top:3%;
   }
   .f{
     color:#01644F;
@@ -130,9 +132,25 @@
     background:#ffff;
     border-radius:35px;
     font-size:13px;
-    margin-left:20%;
     border:1px solid #019B79;
     height:70%;
+  }
+  .gps {
+    height: 30px;
+    width: 30px;
+  }
+  .list{
+    position:fixed;
+    top:67%;
+    height:200px;
+    width:100%;
+  }
+  .shangchuan{
+    margin-left:15%;
+    height:70%;
+    width:70%;
+    display:flex;
+    margin-top:15%;
   }
 </style>
 <template>
@@ -153,48 +171,66 @@
         </view>
       </view> -->
       <view class="c">地点名称
-        <input value="{{scenic}}" class='text' @tap='searchLocation'>
+        <input value="{{scenic}}" class='text' @tap='searchLocation'/>
       </view>
       <view class="d">游玩日期
         <picker mode="date" bindchange="bindDateChange" value="{{date}}" class = 'date'>
+          <!-- <picker-view-column>
+            <view wx:for="{{years}}" wx:key="{{index}}">{{item}}年</view>
+          </picker-view-column>
+          <picker-view-column>
+              <view wx:for="{{months}}" wx:key="{{index}}">{{item}}月</view>
+          </picker-view-column>
+          <picker-view-column>
+              <view wx:for="{{days}}" wx:key="{{index}}">{{item}}日</view>
+          </picker-view-column> -->
           <view class="weui-input" placeholder="选择到哪的时间" style='margin-left:10px;'>{{date}}</view>
         </picker>
       </view>
       <view class='e' wx:if='{{imgbox.length==0}}'>
           <image class='add' mode='aspectFit' src='/static/images/add_pic.jpg' bindtap='uploadPhoto'></image>
         </view>
-        <view class='e' wx:else>
-            <view class='add'>
-              <block wx:key="imgbox" wx:for="{{imgbox}}">
-                <view class='ap-box'>
-                  <view class='add-pic'>
-                    <image class='add-pic' src='{{item}}'></image>
-                    <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
-                      <image class='delete' src='/static/images/close_pic.jpg'></image>
-                    </view>
+        <view class='up-pic e' wx:if='{{imgbox.length>0}}'>
+        <view class='flex pic-box'>
+          <block wx:key="imgbox" wx:for="{{imgbox}}">
+            <view class='ap-box'>
+              <view class='add-pic'>
+                <image class='add-pic' mode='aspectFill' src='{{item}}'></image>
+                  <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
+                    <image class='gps' src='/static/images/close_pic.jpg'></image>
                   </view>
-                </view>
-              </block>
-              <image class='add-pic'  mode='aspectFill' bindtap='uploadPhoto' wx:if="{{imgbox.length<6}}" src='/static/images/add_pic.jpg'></image>
+              </view>
             </view>
+          </block>
+          <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<6}}">
+            <view wx:if='{{imgbox.length==0}}'>
+              <image style='width:{{width}}px;height:280px' src='/static/images/add_pic.jpg'></image>
+            </view>
+            <view style='height:100%' wx:else>
+              <image class='shangchuan' src='/static/images/shangchuan.png'></image>
+            </view>
+          </view>
         </view>
+      </view>
       <view class='f'>隐藏足迹</view>
-      <repeat for="{{list}}" key="index" index="index" item="item">
-          <block wx:if='{{item.isshow}}'>
-            <view class='content' style='color:#019B79;'>
-              <view>{{item.dateString}}</view>
-              <view style='margin-left:5%'>{{item.city}}.{{item.scenic}}</view>
-              <button class='button2' @tap='hideTrace({{index}})'>隐藏</button>
-            </view>
-          </block>
-          <block wx:else>
-            <view class='content'>
-              <view>{{item.dateString}}</view>
-              <view style='margin-left:5%;'>{{item.city}}.{{item.scenic}}</view>
-              <button class='button2' @tap='hideTrace({{index}})'>显示</button>
-            </view>
-          </block>
-      </repeat>
+      <scroll-view scroll-y class='list' bindscrolltoupper='more' bindscrolltolower='jiazai'>
+        <repeat for="{{list}}" key="index" index="index" item="item">
+            <block wx:if='{{item.isshow}}'>
+              <view class='content' style='color:#019B79;'>
+                <view>{{item.dateString}}</view>
+                <view style='margin-left:5%;overflow:hidden;width:40%'>{{item.city}} · {{item.scenic}}</view>
+                <button class='button2' @tap='hideTrace({{index}})'>隐藏</button>
+              </view>
+            </block>
+            <block wx:else>
+              <view class='content'>
+                <view>{{item.dateString}}</view>
+                <view style='margin-left:5%;width:40%'>{{item.city}} · {{item.scenic}}</view>
+                <button class='button2' @tap='hideTrace({{index}})'>显示</button>
+              </view>
+            </block>
+        </repeat>
+      </scroll-view>
     </view>   
 </template>
 <script>
@@ -203,6 +239,20 @@
   import { baseUrl, appId} from '@/config'
   import req from '@/network'
   import qqmapwx from '../map/qqmap-wx-jssdk.js'
+  const date = new Date()
+  const nowYear = date.getFullYear()
+  const nowMonth = date.getMonth() + 1
+  const nowDay = date.getDate()
+
+  // let daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  // // 根据年月 获取当月的总天数
+  // let getDays = function(year, month) {
+  //     if (month === 2) {
+  //         return ((year % 4 === 0) && ((year % 100) !== 0)) || (year % 400 === 0) ? 29 : 28
+  //     } else {
+  //         return daysInMonth[month-1]
+  //     }
+  // }
   export default class Edittrace extends wepy.page {
     config = {
         navigationBarTitleText: '我的足迹',
@@ -219,11 +269,66 @@
       list:[],
       buttonContent:'',
       height:wepy.getSystemInfoSync().windowHeight,
-      width:wepy.getSystemInfoSync().windowWidth
+      width:wepy.getSystemInfoSync().windowWidth,
+      isBack:false,
+      // years:[],
+      // months:[],
+      // days:[],
+      // year:nowYear,
+      // month:nowMonth,
+      // day:nowDay,
+      // value:[]
     }
+    
     bindDateChange(e) {
       this.date = e.detail.value;
     }
+    // setDate(year, month, day, _th){
+    //   let daysNum = year === nowYear && month === nowMonth ? nowDay : getDays(year, month)
+    //   day = day > daysNum ? 1 : day
+    //   let monthsNum = year === nowYear ? nowMonth : 12
+    //   let years = []
+    //   let months = []
+    //   let days = []
+    //   let yearIdx = 9999
+    //   let monthIdx = 0
+    //   let dayIdx = 0
+
+    //   // 重新设置年份列表
+    //   for (let i = 1950; i <= nowYear; i++) {
+    //       years.push(i)
+    //   }
+    //   years.map((v,idx)=> {
+    //       if (v === year){
+    //           yearIdx = idx
+    //       }
+    //   })
+    //   // 重新设置月份列表
+    //   for (let i = 1; i <= monthsNum; i++) {
+    //       months.push(i)
+    //   }
+    //   months.map((v, idx) => {
+    //       if (v === month) {
+    //           monthIdx = idx
+    //       }
+    //   })
+    //   // 重新设置日期列表
+    //   for (let i = 1; i <= daysNum; i++) {
+    //       days.push(i)
+    //   }
+    //   days.map((v, idx) => {
+    //       if (v === day) {
+    //           dayIdx = idx
+    //       }
+    //   })
+    //   this.years = years;
+    //   this.months = months;
+    //   this.days = days;
+    //   this.year = year;
+    //   this.month = month;
+    //   this.day =day;
+    //   //this.date = [yearIdx, monthIdx, dayIdx]
+    // }
     async onLoad(e) {
       if(e.latitude){
         this.latitude = e.latitude;
@@ -233,6 +338,16 @@
         this.city = e.city;
         this.$apply();
       }
+    //  this.setDate(this.year, this.month, this.day);
+      console.log(this.years)
+      await this.getTraces();
+    }
+    onShow(){
+      if(this.$parent.globalData.user.new){
+        wx.switchTab({url:'/pages/trace'})
+      }
+    }
+    async getTraces(){
       let url = baseUrl + `/trace/getMyTraces?userId=${this.$parent.globalData.user.id}`;
       const traces = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
@@ -245,6 +360,7 @@
           let day = date.getDate();
           this.list[i]['dateString'] = year + '.' + month + '.' + day;
         }
+        this.isBack = true;
         this.$apply();
       }
     }
@@ -259,10 +375,10 @@
         console.log(imgbox)
         var picid = e.currentTarget.dataset.pic;
         console.log(picid)
-        var n = 9;
-        if (9 > imgbox.length > 0) {
-          n = 9 - imgbox.length;
-        } else if (imgbox.length == 9) {
+        var n = 6;
+        if (6 > imgbox.length > 0) {
+          n = 6 - imgbox.length;
+        } else if (imgbox.length == 6) {
           n = 1;
         }
         const res = await wepy.chooseImage({
@@ -272,7 +388,7 @@
         })
         if (imgbox.length == 0) {
           imgbox = res.tempFilePaths
-        } else if (9 > imgbox.length) {
+        } else if (6 > imgbox.length) {
           imgbox = imgbox.concat(res.tempFilePaths);
         } else {
           imgbox[picid] = res.tempFilePaths[0];
@@ -292,8 +408,18 @@
         // const markerData = {'latitude': this.latitude, 'longitude': this.longitude,'iconPath':this.iconPath}
         // const markerId = await req.post(markerUrl, markerData).catch((err)=>{
         //   console.log("updateAvatarError...", err.data)})
+        console.log(this.date)
+        let date = this.date.split('-')
+        console.log(parseInt(date[0])-nowYear)
+        if(parseInt(date[0])>nowYear || parseInt(date[1])>nowMonth || parseInt(date[2])>nowDay){
+          wx.showToast({
+            title: '游玩日期不合法',
+            icon: 'success'}
+          )
+          return;
+        }
         let url = baseUrl + '/trace/addTrace';
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city}
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.latitude, 'longitude': this.longitude, 'scenic': this.scenic, 'province':this.province, 'city':this.city,'onmap':0}
         const result = await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         if(result.data.data.traceId){
@@ -314,11 +440,18 @@
                 }
               })
             })(i)
-          }   
+          }
+          wx.showToast({
+            title: '添加成功',
+            icon: 'success',
+            duration: 1000
+          })   
         }
+        this.$parent.globalData.user.new = true
         this.imgbox = [];
         this.scenic = '';
         this.date = '';
+        await this.getTraces();
         this.$apply();
       },
       async hideTrace(index,id,isshow){

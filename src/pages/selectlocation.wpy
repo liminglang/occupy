@@ -13,7 +13,7 @@
       <input class="weui-input" placeholder="输入关键词" value="{{location}}" bindblur='setKey' bindinput="searchLocation"/>
     </view>
     <repeat for="{{list}}" key="index" index="index" item="item">
-      <navigator open-type='redirect' url="/pages/edittrace?latitude={{item.location.lat}}&longitude={{item.location.lng}}&scenic={{item.title}}&province={{item.province}}&city={{item.city}}">
+      <navigator open-type='redirectTo' url="/pages/edittrace?latitude={{item.location.lat}}&longitude={{item.location.lng}}&scenic={{item.title}}&province={{item.province}}&city={{item.city}}">
           <view class='title'>{{item.title}}</view>
           <view class='description weui-cell__ft weui-cell__ft_in-access'>{{item.address}}</view>
           <!-- <view class="weui-cell__ft weui-cell__ft_in-access"></view> -->

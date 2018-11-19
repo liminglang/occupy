@@ -5,7 +5,7 @@
     background:#019B79;
     border-radius:35px;
     color:#ffff;
-    bottom:5%;
+    bottom:3%;
     left:20%;
     height:7%;
   }
@@ -17,10 +17,11 @@
   }
 </style>
 <template>
-    <view>
-      <canvas canvas-id="myCanvas" class="canvas" style='height:{{canvasHeight}}px'/>
-      <button class="confirm" @tap="saveImageToPhotosAlbum">保存到手机</button>
-    </view>
+  <view>
+    <canvas canvas-id="myCanvas" class="canvas" style='height:{{canvasHeight}}px'/>
+    
+    <button class="confirm" @tap="saveImageToPhotosAlbum">保存到手机</button>
+  </view>
 </template>
 <script>
   import wepy from 'wepy'
@@ -42,31 +43,35 @@
       dateString:'',
       imageUrl:'',
       imgbox:[],
-      canvasHeight:100
+      canvasHeight:100,
+      qrcode:''
     }
     async onLoad(e) {
       this.nickName = this.$parent.globalData.user.name;
       this.avatar = this.$parent.globalData.user.avatar;
       await this.getTraceInfo(e.traceId)
+      await this.getQrcode(e.traceId);
       const ctx = wepy.createCanvasContext('myCanvas');
       const width = wepy.getSystemInfoSync().windowWidth;
-      const height = wepy.getSystemInfoSync().windowHeight*0.93;
+      const height = wepy.getSystemInfoSync().windowHeight*0.9;
       this.canvasHeight = height;
       let self = this;
       console.log("canvasHeight===========",this.canvasHeight)
      // ctx.rect(5,5,width-10,height-10)
      // ctx.stroke()
     //   //const radius = width * 105/430
-      ctx.beginPath()
+      ctx.beginPath();
+      ctx.setFillStyle('#fff')
+      ctx.fillRect(0,0,width,height)
       ctx.setFontSize(13);
       ctx.setFillStyle('#019B79')
       ctx.fillText(this.nickName,100,35);
-      ctx.fillText("第"+this.number + '个占领者',30,height-70)
+      ctx.fillText("第"+this.number + '个占领者',30,height-40)
       ctx.fill()
       ctx.setFillStyle('#939393')
       ctx.fillText(this.declaration,100,65);
-      ctx.fillText(this.dateString,30, height-120);
-      ctx.fillText(this.city + ' . '+ this.locationName,30, height-95);
+      ctx.fillText(this.dateString,30, height-90);
+      ctx.fillText(this.city + ' . '+ this.locationName,30, height-65);
       ctx.fill()
       ctx.save();
       ctx.restore();
@@ -76,10 +81,21 @@
         image = await wepy.downloadFile({url:this.imgbox[0]});
         image = image.tempFilePath;
       }
-      ctx.drawImage(image,0, 85, width, height-230);
+      const imgInfo = await wepy.getImageInfo({src:image});
+      if((imgInfo.height/(height-230))>(imgInfo.width/width)){
+        const tempHeight = (height-230) * imgInfo.width/width;
+        const sy = (imgInfo.height - tempHeight)/2
+        ctx.drawImage(image,0, sy, imgInfo.width, tempHeight,0, 85, width, height-200);
+      }else{
+        const tempWidth = width*(imgInfo.height/(height-230));
+        const sx = (imgInfo.width - tempWidth)/2
+        ctx.drawImage(image,sx, 0, tempWidth, imgInfo.height,0, 85, width, height-200);
+      }
+    //  ctx.drawImage(image,0, 85, width, height-230);
      // ctx.drawImage("/static/images/address.jpg",10, height-55, 13, 20);
       ctx.stroke()
-      ctx.drawImage("/static/images/qrcode.jpg", width-110, height-135, 80, 80);
+      let qrcode = await wepy.downloadFile({url:this.qrcode});
+      ctx.drawImage(qrcode.tempFilePath, width-110, height-105, 100, 100);
       ctx.save();
       ctx.beginPath()
       ctx.arc(45, 45, 35, 0, 2 * Math.PI);
@@ -87,20 +103,27 @@
       let avatar = await wepy.downloadFile({url:this.avatar}); 
       ctx.drawImage(avatar.tempFilePath, 10, 10, 70, 70);
       ctx.save()
-      ctx.draw(true, async ()=>{
-        const res = await wepy.canvasToTempFilePath({
+      ctx.draw();
+      // ctx.draw(true, async ()=>{
+      setTimeout(async () => {
+        const res = await wx.canvasToTempFilePath({
           x:0,
           y:0,
           width:width,
-          height:height,
+          height:4*height,
           destWidth:width,
           destHeight:height,
           canvasId: 'myCanvas',
-          fileType: 'jpeg'
+          fileType:'jpg',
+          async success(res) {
+            self.imageUrl = res.tempFilePath;
+          }
         });
-        self.imageUrl = res.tempFilePath;
+      }, 1000);  
+        
+        
         self.$apply();
-      })
+      // })
     }
     async getImages(traceId){
       let url = baseUrl + `/image/get?traceId=${traceId}`;
@@ -128,7 +151,19 @@
       let month = date.getMonth()+1;
       let day = date.getDate();
       this.dateString = year + '.' + month + '.' + day;
-      this.getImages(traceId)
+      await this.getImages(traceId)
+      console.log(this.imgbox)
+    }
+    async getQrcode(traceId){
+      const userId = this.$parent.globalData.user.id;
+      let url = baseUrl+`/auth/getWxacode?userId=${userId}&traceId=${traceId}`
+      const res = await req.get(url).catch((err) => {
+        console.log("cache error...", err);
+        return {}
+      })
+      this.qrcode = baseUrl+"/static/qrcode/"+ res.data.data.filename
+      this.$apply();
+      console.log("this.qrcode",this.qrcode)
     }
 
     methods = {

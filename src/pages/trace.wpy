@@ -66,13 +66,13 @@
     height:100%
   }
   .image{
-    width:90%;
+    width:50%;
     height:50%;
-
+    margin: 10%;
   }
   .modal-mask {
     width: 100%;
-    height: 75%;
+    height: 80%;
     position: fixed;
     top: 0;
     left: 0;
@@ -85,10 +85,10 @@
 
 .modal-dialog {
   width: 100%;
-  height: 25%;
+  height: 20%;
   overflow: hidden;
   position: fixed;
-  top: 75%;
+  top: 80%;
   z-index: 9999;
   background: #f9f9f9;
   border-radius: 10rpx;
@@ -132,8 +132,10 @@
       <!-- <view class="modal-dialog" wx:if="{{showModal}}"> -->
         <cover-view class='a'>
           <!-- <image class='close' mode='aspectFit' src='/static/images/close_pic.jpg' bindtap='closeModal'></image> -->
-          <button open-type="share" class='share'><cover-image class='image' src='/static/images/weixin.jpg' ></cover-image>微信分享</button>
-          <button @tap='savePhoto' class='share'><cover-image class='image' src='/static/images/friend.jpg'></cover-image>保存图片</button>
+          <button open-type="share" class='share'>
+            <cover-image class='image' src='/static/images/weixin.jpg' ></cover-image>
+          </button>
+          <button @tap='savePhoto' class='share'><cover-image class='image' src='/static/images/friend.jpg'></cover-image></button>
         </cover-view>
       <!-- </view> -->
     </cover-view>
@@ -148,11 +150,13 @@
     import wepy from 'wepy';
     import 'wepy-async-function'
     import { baseUrl, appId} from '@/config'
-    import req from '@/network'
+    import req from '@/network';
+    import WxCanvas from '../ec-canvas/wx-canvas';
     import _ from 'underscore'
     import EcCanvas from '../ec-canvas/ec-canvas';
     import * as echarts from '../ec-canvas/echarts.min';
     import geoJson from '../static/data/china.js';
+    let data = {};
     export default class PieChartPage extends wepy.page {
       config = {
           navigationBarTitleText: '我的足迹',
@@ -163,11 +167,14 @@
       };
       data = {
           canvasId: 'myMap',
+          height:wepy.getSystemInfoSync().windowHeight,
+          width:wepy.getSystemInfoSync().windowWidth,
           showModal:false,
           echart:'',
+          refresh:false,
           ec: {
               onInit: this.initChart,
-              myChart:''
+              traceCount:0
           },
           geoCoordMap:[],
           animationData:{}
@@ -175,8 +182,26 @@
       
       onLoad() {
         
-        this.$apply();
-        console.log("ec========",this.ec)
+      }
+      async onShow(){
+        if(this.refresh && this.$parent.globalData.user.new){
+          // let url = baseUrl + `/trace/getMyTraces?userId=${this.$parent.globalData.user.id}`;
+          // const traces = await req.get(url).catch((err)=>{
+          //   console.log("updateAvatarError...", err.data)})
+          // let provinces = [];
+          // if (traces.data) {
+          //   this.ec.data = traces.data.data;
+          // }
+          // this.$apply();
+          const ctx = wx.createCanvasContext(this.canvasId, this);
+          const canvas = new WxCanvas(ctx);
+          this.initChart(canvas,this.width,this.height,this.$parent.globalData.user.id)
+          this.$parent.globalData.user.new = false;
+        }
+        
+      }
+      onReady(){
+        this.refresh = true;
       }
       onShareAppMessage(res) {
         let title = "足迹占领";
@@ -200,8 +225,9 @@
         const traces = await req.get(url).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         let provinces = [];
-        if (traces.data) {
+        if (traces.data.data) {
           let data = traces.data.data;
+          this.traceCount = data.length;
           console.log("data============",data)
           for(var i=0;i<data.length;i++) {
             let marker = {};
@@ -222,31 +248,36 @@
         canvas.setChart(chart);
         echarts.registerMap('china', geoJson);
         const option = {
+          // backgroundColor: {
+          //   type: "pattern",
+          //   repeat: "repeat",
+          //   color:'red'
+          // },
           tooltip: {
             trigger: 'item'
           },
-          geo: {
-            show: true,
-            map: 'china',
-            label: {
-                normal: {
-                    show: false
-                },
-                emphasis: {
-                    show: false,
-                }
-            },
-            roam: true,
-            itemStyle: {
-                normal: {
-                    areaColor: '#019B79',
-                    borderColor: '#3B5077',
-                },
-                emphasis: {
-                    areaColor: '#019B79',
-                }
-            }
-          },
+          // geo: {
+          //   show: true,
+          //   map: 'china',
+          //   label: {
+          //       normal: {
+          //           show: false
+          //       },
+          //       emphasis: {
+          //           show: false,
+          //       }
+          //   },
+          //   roam: true,
+          //   itemStyle: {
+          //       normal: {
+          //           areaColor: '#019B79',
+          //           borderColor: '#3B5077',
+          //       },
+          //       emphasis: {
+          //           areaColor: '#019B79',
+          //       }
+          //   }
+          // },
           series: [{
             type: 'map',
             mapType: 'china',
@@ -272,29 +303,29 @@
             },
             data: provinces
           },
-          {
-            name: '散点',
-            type: 'scatter',
-            coordinateSystem: 'geo',
-            data: geoCoordMap,
-           //symbolSize: 20,
-           // symbol:'svg://https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541569449942&di=1f6c322a29c46589780aeff20ad3e24b&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2Fdfa495a5e708e2a6.jpg'
-            label: {
-                normal: {
-                    formatter: '{b}',
-                    position: 'right',
-                    show: true
-                },
-                emphasis: {
-                    show: true
-                }
-            },
-            itemStyle: {
-                normal: {
-                    color: '#05C3F9'
-                }
-            }
-          },
+          // {
+          //   name: '散点',
+          //   type: 'scatter',
+          //   coordinateSystem: 'geo',
+          //   data: geoCoordMap,
+          //  //symbolSize: 20,
+          //  // symbol:'svg://https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541569449942&di=1f6c322a29c46589780aeff20ad3e24b&imgtype=0&src=http%3A%2F%2Fimg.bqatj.com%2Fimg%2Fdfa495a5e708e2a6.jpg'
+          //   label: {
+          //       normal: {
+          //           formatter: '{b}',
+          //           position: 'right',
+          //           show: true
+          //       },
+          //       emphasis: {
+          //           show: true
+          //       }
+          //   },
+          //   itemStyle: {
+          //       normal: {
+          //           color: '#05C3F9'
+          //       }
+          //   }
+          // },
           {
             name:'省份',
             type:'pie',
@@ -401,7 +432,7 @@
         }
       methods = {
         editTrace(){
-          wx.navigateTo({url: 'edittrace'})
+          wx.navigateTo({url: '/pages/edittrace'})
         },
         hideModal(){
           this.showModal = false;

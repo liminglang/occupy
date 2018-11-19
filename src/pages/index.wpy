@@ -10,13 +10,9 @@
   }
   .large{
     position: fixed;
-    left: 0px;
-    top: 270px;
   }
   .narrow{
     position: fixed;
-    left: 0px;
-    top: 300px;
   }
   .occupy{
     position: fixed;
@@ -24,8 +20,8 @@
     top: 0px;
   }
   .img{
-    width: 30px;
-    height: 30px;
+    width: 28pt;
+    height: 36pt;
   }
   .avatar{
     width: 100%;
@@ -43,48 +39,50 @@
     border-radius: 35px;	//圆角的大小
     color:#ffff;
     font-size: 14px;
-    margin-top: 10%;
+    margin-top: 2%;
   }
   .gps {
-    height: 20px;
-    width: 4%;
+    height: 30px;
+    width: 30px;
   }
   .flex {
     display:flex;
   }
   .up-pic {
-    width:90%;
-    height:100%;
+    width: 90%;
+    height: 45%;
     margin:0 auto;
-    justify-content:center;
-    border:1px solid #EBEBEB
+    justify-content: center;
+    border:1px solid #EBEBEB;
   }
   .pic-box{  
-    width:90%;
-    height:50%;
-    margin:0 auto;
+    margin-top:5rpx;  
+    flex-flow:wrap;  
+    width:95%;   
   } 
   .ap-box{  
-    position: relative;
-    width:30%;
-    height:100%;
+    position: relative;  
   }
   .add-pic{  
-    width:100%;
-    height:80%;
+    width: 160rpx;  
+    height: 160rpx;  
+    margin-right: 20rpx;  
+    position: relative;  
+    margin: 15rpx 20rpx 20rpx 30rpx; 
   } 
   .img-de{  
-    width:20px;  
-    height:20px;  
+    width:45rpx;  
+    height:45rpx;  
     border-radius:50%;  
     position:absolute;  
     right:-41rpx;  
     top:5rpx;  
   }
   .add {
-    margin: 5%;
+    margin-left: 5%;
     height: 100%;
     width: 90%;
+    display: flex;
   }
   .a{
     margin-top: 10%;
@@ -130,7 +128,7 @@
   height: 15%;
   width: 95%;
   margin-top: 6%;
-  font-size: 12px;
+  font-size: 13pt;
   color: #019B79;
 }
 .jiantou {
@@ -140,11 +138,10 @@
   width: 15px;
 }
 .attention{
-  font-size: 12px;
-  color: #939393;
-  margin-top: 10%;
-  width: 100%;
-  text-align: center;
+  font-size:10pt;
+  color:#939393;
+  text-align:center;
+  margin-top: 2%;
 }
 .close{
   width:5%;
@@ -165,9 +162,9 @@
   }
  .two_heart{
     display:inline-block;
-    width:10%;
+    width:6%;
     margin-left:3%;
-    height:35%;
+    height:30%;
   }
   .two_avatar {
     border-radius: 50%;
@@ -205,7 +202,9 @@
     height:100%;
     margin:0 auto;
     justify-content:center;
-    border:1px solid #EBEBEB
+    border:1px solid #EBEBEB;
+    flex-wrap:wrap;
+    display: flex;
   }
   .two_pic-box{  
     width:90%;
@@ -215,7 +214,9 @@
   .two_ap-box{  
     position: relative;
     width:30%;
-    height:100%;
+    height:50%;
+    margin-left:3%;
+    margin-top:2%;
   }
   .two_add-pic{  
     width:100%;
@@ -224,7 +225,7 @@
   .date{
     color:#939393;
     font-size:10pt;
-    margin-left:40%
+    margin-left:10%
   }
   .c{
     color:#019B79;
@@ -234,97 +235,132 @@
     display:flex;
     width:100%
   }
+  .shangchuan{
+    margin-left:15%;
+    height:70%;
+    width:70%;
+    display:flex;
+    margin-top:15%;
+  }
 </style>
 <template>
   <view>
-    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="occupy"  controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="updated" show-location>
+    <map class='map' style='height:{{height}}px' id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="occupy"  controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange	="updated" show-location>
       <!-- <cover-view wx:if='{{showModal==false}}'> -->
         <cover-view>
           <block wx:if="{{!isAuth}}">
             <button class='button' open-type="getUserInfo" bindgetuserinfo="userLogin">点击授权</button>
           </block>
         </cover-view>
-        <cover-view class="large" @tap="large">
-          <cover-image class="img" src="/static/images/jia.jpg" />
-        </cover-view>
-        <cover-view class="narrow" @tap="narrow">
-          <cover-image class="img" src="/static/images/jian.jpg" />
-        </cover-view>
-        <cover-view class="avatar-position">
-          <cover-image wx:if='{{isDisplay}}' @tap="disPlay" class="avatar" src="/static/images/showavatar.png"/>
-          <cover-image wx:if='{{!isDisplay}}' @tap="disPlay" class="avatar" src="/static/images/hideavatar.png"/>
-        </cover-view>
+        <!-- <cover-view wx:if='{{!showModal}}'> -->
+          
+        <!-- </cover-view> -->
       <!-- </cover-view> -->
     </map>
+      <cover-view class="large" style='top:330px;left:{{width-75}}px;' @tap="large" wx:if='{{!showModal}}'>
+        <cover-image class="img" src="/static/images/jia.jpg" />
+      </cover-view>
+      <cover-view class="narrow"  style='display:fixed;top:378px;left:{{width-75}}px' @tap="narrow" wx:if='{{!showModal}}'>
+        <cover-image class="img" src="/static/images/jian.jpg" />
+      </cover-view>
+      <cover-view style='position:fixed;top:100px;left:{{width-50}}px' wx:if='{{isDisplay && !showModal}}'>
+        <cover-image  @tap="disPlay" style='width:50px;height:35px' src="/static/images/showavatar.png"/>
+      </cover-view>
+      <cover-view style='position:fixed;top:100px;left:{{width-50}}px' wx:else>
+        <cover-image wx:if='{{!isDisplay && !showModal}}' @tap="disPlay" style='width:50px;height:35px' src="/static/images/hideavatar.png"/>
+      </cover-view>
+      <cover-view style='position:fixed;top:450px;left:{{width-75}}px' wx:if='{{!showModal}}'>
+        <cover-image  @tap="occupy" style='width:50px;height:50px' src="/static/images/occupy.png"/>
+      </cover-view>
       <!-- <cover-view class="occupy" @tap="occupy">
         <cover-image class="img" src="/static/images/occupy.jpg" />
       </cover-view> -->
       <cover-view class="modal-mask" @tap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></cover-view>
-      <view class="modal-dialog" wx:if="{{showModal && !isOccupied}}">
+      <view class="modal-dialog" wx:if="{{showModal && markerId ==-1}}">
         <image class='close' mode='aspectFit' src='/static/images/close_pic.jpg' bindtap='closeModal'></image>  
-        <textarea rows="2" cols="20"  value='{{content}}' class='text'></textarea>
-        <view style='width:100%;height:35%' wx:if='{{imgbox.length==0}}'>
+        <textarea rows="2" cols="20"  value='{{content}}' class='text' bindblur='bindFormSubmit'></textarea>
+        <view style='width:100%;height:45%' wx:if='{{imgbox.length==0}}'>
           <image class='add' mode='aspectFit' src='/static/images/add_pic.jpg' bindtap='uploadPhoto'></image>
         </view>
-        <view style='height:35%;width:100%;' wx:else>
+        <!-- <view style='height:35%;width:100%;' wx:else>
             <view class='add'>
               <block wx:key="imgbox" wx:for="{{imgbox}}">
                 <view class='ap-box'>
                   <view class='add-pic'>
-                    <image class='add-pic' src='{{item}}'></image>
+                    <image  src='{{item}}'></image>
                     <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
                       <image class='delete' src='/static/images/close_pic.jpg'></image>
                     </view>
                   </view>
                 </view>
               </block>
-              <image class='add-pic'  mode='aspectFill' bindtap='uploadPhoto' wx:if="{{imgbox.length<6}}" src='/static/images/add_pic.jpg'></image>
+              <image style = 'height:50%;width:30%;margin-left:15px;'  mode='aspectFill' bindtap='uploadPhoto' wx:if="{{imgbox.length<6}}" src='/static/images/add_pic.jpg'></image>
             </view>
+        </view> -->
+        <view class='up-pic' wx:if='{{imgbox.length>0}}'>
+        <view class='flex pic-box'>
+          <block wx:key="imgbox" wx:for="{{imgbox}}">
+            <view class='ap-box'>
+              <view class='add-pic'>
+                <image class='add-pic' mode='aspectFill' src='{{item}}'></image>
+                  <view class='img-de' data-deindex='{{index}}' bindtap='imgDelete'>
+                    <image class='gps' src='/static/images/close_pic.jpg'></image>
+                  </view>
+              </view>
+            </view>
+          </block>
+          <view class='add-pic' bindtap='uploadPhoto' wx:if="{{imgbox.length<6}}">
+            <view wx:if='{{imgbox.length==0}}'>
+              <image style='width:{{width}}px;height:280px' mode='aspectFit' src='/static/images/add_pic.jpg'></image>
+            </view>
+            <view style='height:100%' wx:else>
+              <image class='shangchuan' mode='aspectFill' src='/static/images/shangchuan.png'></image>
+            </view>
+          </view>
         </view>
+      </view>
         <view class='a'>
           <!-- <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active"> -->
             <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:30px'></image>
-            <view style='color:#019B79;margin-left:5px;display:inline-block'>{{city}}.{{scenic}}</view>
+            <view style='color:#019B79;margin-left:5px;display:inline-block'>{{city}} · {{scenic}}</view>
             <image class="jiantou selectlocation" mode='aspectFit' src="/static/images/jiantou.png" mode='aspectFit' @tap='chooseLocation'></image>
           <!-- </navigator> -->
         </view>
         <button class='confirm' @tap="confirm">确认</button>
         <view class ='attention'>注意：占领默认时长为24小时,每收获一个赞,延长一小时。</view>
       </view>
-      <view class="modal-dialog" wx:if="{{showModal && markerId}}">
+      <view class="modal-dialog" wx:if="{{showModal && markerId>-1}}">
         <image class='close' mode='aspectFit' src='/static/images/close_pic.jpg' bindtap='closeModal'></image>
         <view class="two_a">
           <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{avatar}}"></image>
           <view class='two_text'>
             <view class='two_content'>{{name}}</view>
-            <view class='two_declaration'>{{declaration}}</view>
+            <view wx:if='{{declaration}}' class='two_declaration'>{{declaration}}</view>
           </view>
-          <image class="two_heart" mode="aspectFit" src="{{imageUrl}}" @tap='changeParisecount({{id}})'></image>
+          <image class="two_heart" mode="aspectFill" src="{{imageUrl}}" @tap='changeParisecount({{id}})'></image>
           <view wx:if="{{parisecount}}" style='display:inline-block;margin-left:5px;'>{{parisecount}}</view>
         </view>
         <view class = 'c'>
           <view style='font-size:10pt'>第</view>
-          <view style='font-size:16pt'>{{number}}</view>
+          <view style='font-size:16pt;margin-top:-2%'>{{number}}</view>
           <view style='font-size:10pt'>个占领此处</view>
         </view>
         <view style='width:100%;height:40%;margin-top:2%'>
           <view class='two_up-pic'>
-            <view class='flex two_pic-box'>
               <block wx:key="imgbox" wx:for="{{imgbox}}">
                 <view class='two_ap-box'>
-                    <image class='two_add-pic' mode="aspectFit" src='{{item}}' @tap="previewImage({{item}})"></image>
+                    <image class='two_add-pic' mode="aspectFill" src='{{item}}' @tap="previewImage({{item}})"></image>
                 </view>
               </block>
-            </view>
           </view>
         </view>
         <view class='a' style='margin-top:5%'>
           <!-- <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active"> -->
           <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
-          <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:13pt;'>{{city}}.{{locationName}}</view>
+          <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:13pt;width:50%'>{{city}} · {{scenic}}</view>
           <view class='date'>{{dateString}}</view>
         </view>
-        <view style='width:100%;align-items: center; display:flex'>
+        <view style='width:100%;align-items: center; display:flex;margin-top:10%'>
           <block wx:if="{{isOwner}}">
             <button class="confirm"  open-type="share">分享给好友</button>
             <button class="confirm"  @tap="getPost">生成海报</button>
@@ -343,6 +379,7 @@
   import { baseUrl, appId,txMapsKey} from '@/config'
   import req from '@/network'
   import _ from 'underscore'
+  let tout ;
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '旅行的我',
@@ -369,19 +406,21 @@
         async success (res) {
           self.latitude = res.latitude
           self.longitude = res.longitude
+          self.curLatitude = res.latitude
+          self.curLongitude = res.longitude
           self.$apply();
           self.mapCtx = wx.createMapContext('map'); 
           self.mapCtx.moveToLocation();
-          self.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-            iconPath: '/static/images/occupy.png',
-            id: 0,
-            latitude: self.latitude,
-            longitude: self.longitude,
-            width: 30,
-            height: 30,
-            avatars:[],
-            traceIds:[]
-          })
+          // self.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
+          //   iconPath: '/static/images/occupy.png',
+          //   id: 0,
+          //   latitude: self.curLatitude,
+          //   longitude: self.curLatitude,
+          //   width: 30,
+          //   height: 30,
+          //   avatars:[],
+          //   traceIds:[]
+          // })
           if(self.isDisplay){
             await self.getTraces();
           }
@@ -410,19 +449,21 @@
                               async success (res) {
                                 self.latitude = res.latitude
                                 self.longitude = res.longitude
+                                self.curLatitude = res.latitude
+                                self.curLongitude = res.longitude
                                 self.$apply(); 
                                 self.mapCtx = wx.createMapContext('map'); 
                                 self.mapCtx.moveToLocation();
-                                self.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
-                                  iconPath: '/static/images/occupy.png',
-                                  id: 0,
-                                  latitude: self.latitude,
-                                  longitude: self.longitude,
-                                  width: 30,
-                                  height: 30,
-                                  avatars:[],
-                                  traceIds:[]
-                                })
+                                // self.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
+                                //   iconPath: '/static/images/occupy.png',
+                                //   id: 0,
+                                //   latitude: self.curLatitude,
+                                //   longitude: self.curLongitude,
+                                //   width: 30,
+                                //   height: 30,
+                                //   avatars:[],
+                                //   traceIds:[]
+                                // })
                                 if(self.isDisplay){
                                   await self.getTraces();
                                 }
@@ -441,28 +482,28 @@
           })
         }
       })
+      if(e.scene){
+        let scene = decodeURIComponent(e.scene);
+        console.log("scene[1]====",scene.split('&')[1]);
+        
+        await this.getTraceInfo(parseInt(scene.split('&')[1]),1);
+        await this.getOtherTraces();
+        this.markerId =1;
+        this.showModal = true;
+        this.$apply();
+      }
     }
  
-    afterOccupy(traceId,iconPath){
+    async afterOccupy(traceId,iconPath){
       console.log("traceID======",traceId)
       this.isOccupied = true;
       this.isOwner = true;
       this.markerId = 1;
-      let traceIds = []
-      let avatars = []
-      traceIds.push(traceId);
-      avatars.push(this.$parent.globalData.user.avatar);
-      if(!this.isOccupied){        
-        this.markers.push({
-          iconPath:iconPath ,
-          id: this.markers.length,
-          latitude: this.latitude,
-          longitude: this.longitude,
-          width: 30,
-          height: 30,
-          avatars:avatars,
-          traceIds:traceIds
-        })
+      this.imgbox = [];
+      this.content = "占领宣言：" + this.$parent.globalData.user.name +'到此一游!';
+      await this.getTraceInfo(traceId)
+      if(this.isDisplay){
+        await this.getTraces()
       }
       this.$apply();
       console.log(this.markers)
@@ -482,7 +523,7 @@
       curLongitude:0,
       scenic:'',
       markers: [],
-      markerId:0,
+      markerId:-1,
       controls: [],
       range_x: 0,
       range_y: 0,
@@ -505,19 +546,44 @@
       dateString:'',
       avatar_height:0,
       parisecount:0,
-      isParised:false
+      isParised:false,
+      northeast:{},
+      southwest:{}
     }
-    async updated(e) {
+    updated(e) {
+      let self = this;
+      if(tout){
+        clearTimeout(tout);
+      }
+      tout = setTimeout(async()=>{
+        if(e.type =='end'  && self.isOnload && !self.showModal){
+            if(self.isDisplay){
+              await self.getTraces()
+            self.$apply();
+            }
+          }
+        if(e.causedBy == 'scale'){
+          self.mapCtx.getScale({
+            success(res){
+              self.scale = res.scale+1;
+              self.$apply()
+            }
+          })
+        }
+      },1000)  
+    }
+      // function handler(){
+      //     tout = null;
+      // }
       
-      this.$apply();
-    }
+        
+    
     markertap(e) {
-      console.log("e===============",this.markers)
-      if(e.markerId == 0){
-        this.occupy()
-      }else{
+      // if(e.markerId == 0){
+      //   this.occupy()
+      // }else{
         console.log(e.markerId);
-        console.log(this.markers)
+          console.log(this.markers[e.markerId])
         if(this.markers[e.markerId].traceIds.length==1){
           this.markerId = e.markerId;
           this.getTraceInfo(this.markers[e.markerId].traceIds[0])
@@ -530,26 +596,26 @@
         }else{
           wx.navigateTo({url: `/pages/tracelist?traceIds=${this.markers[e.markerId].traceIds}`})
         }
-      }
+      // }
     }
     async getCenterLocation(){
       let self = this;
       const res = await wepy.getLocation({
         type: 'gcj02'
       });
-      console.log(this.latitude,this.longitude,"************************")
     }
     async getRegion(){
       let self = this;
       await this.mapCtx.getRegion({
         success: function(res){
-          self.range_x = res.northeast.latitude;
-          self.range_y = res.northeast.longitude;
-          console.log("getregion-----",self.range_x,self.range_y)
+          let offset = (res.northeast.latitude-res.southwest.latitude)*30/self.height
+          self.markers[0].latitude = self.curLatitude - offset
+          console.log(self.latitude,res.southwest.latitude)
+          console.log(self.scale,offset,self.markers[0].latitude)
           self.$apply();
         }
       });
-      console.log("region======",this.range_x,this.range_y)
+      //console.log("region======",this.range_x,this.range_y)
     }
     async getCityNameFromTX(latitude, longitude) {
       const url = `https://apis.map.qq.com/ws/geocoder/v1/?location=${latitude},${longitude}&key=${txMapsKey}`;
@@ -571,74 +637,64 @@
     async getTraces(){
       console.log("this.scale=========",this.scale)
       let self = this;
-      wx.getLocation({
-        type: 'gcj02',
-        success (res) {
+      self.mapCtx.getCenterLocation({
+        async success (res) {
           self.latitude = res.latitude;
           self.longitude = res.longitude;
-          self.$apply();
+          await self.mapCtx.getRegion({
+            success:async function(res){
+              let latitude1,longitude1,range_x1,range_y1,range_x2,range_y2,width1,height1;
+              latitude1 = self.latitude
+              longitude1 = self.longitude
+              range_x1 = res.northeast.latitude;
+              range_y1 = res.northeast.longitude;
+              range_x2 = res.southwest.latitude;
+              range_y2 = res.southwest.longitude;
+              width1 = self.width;
+              height1 = self.height;
+              self.markers = []
+              // self.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
+              //   iconPath: '/static/images/occupy.png',
+              //   id: 0,
+              //   latitude: self.curLatitude,
+              //   longitude: self.curLongitude,
+              //   width: 40,
+              //   height: 30,
+              //   avatars:[],
+              //   traceIds:[]
+              // })
+              // let offset = (res.northeast.latitude-res.southwest.latitude)*40/self.height
+              // self.markers[0].latitude = self.curLatitude - offset
+              let url = baseUrl + `/trace/getTraces?latitude=${latitude1}&longitude=${longitude1}&range_x1=${range_x1}&range_y1=${range_y1}&range_x2=${range_x2}&range_y2=${range_y2}&width=${width1}&height=${height1}`;
+              const traces = await req.get(url).catch((err)=>{
+                console.log("updateAvatarError...", err.data)})
+              self.markers = _.union(self.markers,traces.data.data)
+              console.log("self.",self.markers)
+              self.$apply();
+              // if(self.isDisplay){
+              //   setTimeout(async()=>{
+              //     await self.drawAvatar(self.markers);
+              //   },200)
+              // }
+            }
+          });
         }
       })
-      await this.getRegion();
-     // this.getCityNameFromTX();
-      let latitude1,longitude1,range_x1,range_y1;
-      latitude1 = self.latitude
-      longitude1 = self.longitude     
-      setTimeout(async () =>{
-        if(range_x1>=1){
-          range_x1 = range_x1 - latitude1;
-          //self.$apply();
-        }
-        if(range_y1>=1){ 
-          range_y1 = range_y1 - longitude1;
-         // self.$apply();
-        }
-        let url = baseUrl + `/trace/getTraces?latitude=${latitude1}&longitude=${longitude1}&range_x=0.25&range_y=0.25`;
-        const traces = await req.get(url).catch((err)=>{
-          console.log("updateAvatarError...", err.data)})
-        if (traces.data) {
-          let data = traces.data.data;
-          let scenices = _.groupBy(data,function(obj){
-            return obj.scenic
-            });
-          let k = 1;
-          for(var i in scenices) {
-            let marker = {};
-            marker['id'] = k;
-            marker['latitude'] = scenices[i][0].latitude;
-            marker['longitude'] = scenices[i][0].longitude;
-            marker['width'] = 40;
-            marker['height'] = 40;
-            //marker['name'] = i;
-            marker['traceIds'] = _.pluck(scenices[i], 'id');
-           // marker['iconPath'] = scenices[i][0].iconPath
-            marker['avatars'] = _.pluck(scenices[i], 'avatar');
-            self.markers.push(marker);
-            k = k+1;
-          }
-        }
-        if(self.isDisplay){
-          setTimeout(async()=>{
-            await self.drawAvatar(self.markers);
-          },200)
-        } 
-        self.$apply();
-      },1000);
-      
-        
-     // this.$apply();
+      self.$apply();
     }
-    async getTraceInfo(traceId){
+    async getTraceInfo(traceId,way){
       let url = baseUrl + `/trace/getTrace?traceId=${traceId}`;
       const result = await req.get(url).catch((err)=>{
         console.log(err.data)})
       let trace = result.data.data;
       this.name = trace.name;
       this.locationName = trace.scenic;
+      this.scenic = trace.scenic;
       this.city = trace.city;
       this.declaration = trace.declaration;
       this.parisecount = trace.parisecount;
       this.number = trace.number;
+      this.avatar = trace.avatar;
       let date  = new Date(trace.created*1000);
       let year = date.getFullYear();
       let month = date.getMonth()+1;
@@ -646,6 +702,10 @@
       this.dateString = year + '.' + month + '.' + day;
       if(trace.userId == this.$parent.globalData.user.id){
         this.isOwner = true;
+      }
+      if(way){
+        this.latitude = trace.latitude;
+        this.longitude = trace.longitude
       }
       let self = this;
       wx.getStorage({
@@ -689,41 +749,42 @@
       ctx.beginPath()
       for(var j=1; j < markers.length; j++){  
         let offset = 0
-        for(var i=markers[j].avatars.length-1; i >=0; i--){
+        if(markers[j].avatars.length>1){
+          for(var i=markers[j].avatars.length-1; i >=0; i--){
           let avatar = await wepy.downloadFile({url:markers[j].avatars[i]}); 
           ctx.drawImage(avatar.tempFilePath, x - offset-d, 40*(j-1), d, 40);
           ctx.save()
-          offset = offset + 40*Math.pow(0.8,i)
+          offset = offset + 40*Math.pow(0.20,i)
+          }
+          markers[j]['width'] = offset
         }
-        markers[j]['width'] = offset
       } 
       
       ctx.draw(true, async ()=>{
         //绘制方法
         for(var j=1; j < markers.length; j++){
-          const res = await wepy.canvasToTempFilePath({
-            x:x-markers[j]['width'],
-            y:40*(j-1),
-            width:markers[j]['width'],
-            height:40,
-            destWidth:markers[j]['width'],
-            destHeight:40,
-            canvasId: 'myCanvas',
-            fileType: 'jpeg',
-          });
-          markers[j]['iconPath'] = res.tempFilePath;
+          if(markers[j].avatars.length>1){
+            const res = await wepy.canvasToTempFilePath({
+              x:x-markers[j]['width'],
+              y:40*(j-1),
+              width:markers[j]['width'],
+              height:40,
+              destWidth:markers[j]['width'],
+              destHeight:40,
+              canvasId: 'myCanvas',
+              fileType: 'jpeg',
+            });
+            markers[j]['iconPath'] = res.tempFilePath;
+          }
         }
         self.markers = markers;
-        console.log("markers=====",this.markers)
         self.$apply();
       })
     }
     async uploadPhoto(e){
       let self = this;
       var imgbox = self.imgbox;
-      console.log(imgbox)
       var picid = e.currentTarget.dataset.pic;
-      console.log(picid)
       var n = 6;
       if (6 > imgbox.length > 0) {
         n = 6 - imgbox.length;
@@ -743,16 +804,14 @@
         imgbox[picid] = res.tempFilePaths[0];
       }
       self.imgbox = imgbox;
-      console.log("self.imgbox=====",self.imgbox)
       self.$apply();
     }
     async closeModal(){
       this.showModal = false;
       this.isOwner = false;
       this.imgbox = []
-      await this.getTraces();
+      this.height = wepy.getSystemInfoSync().windowHeight 
       await wepy.showTabBar();
-      this.height = wepy.getSystemInfoSync().windowHeight
       this.$apply();
   }
     async occupy() {
@@ -761,10 +820,10 @@
           title: '请先授权用户信息',
           icon:'none'})
       }else{
-        // wx.navigateTo({url: `/pages/occupy?latitude=${this.markers[0].latitude}&longitude=${this.markers[0].longitude}`})
-        this.getCityNameFromTX(this.markers[0].latitude,this.markers[0].longitude);
-        this.showModal = true
-        //await wepy.hideTabBar();
+        this.getCityNameFromTX(this.curLatitude,this.curLongitude);
+        this.showModal = true;
+        this.isOccupied = false;
+        this.markerId = -1;
         this.height = 0.2*wepy.getSystemInfoSync().windowHeight
         this.$apply();
       }
@@ -777,7 +836,6 @@
           if (setting.authSetting['scope.userInfo']) {
             const info = await wepy.getUserInfo()
             this.$parent.globalData.userInfo = info.userInfo
-         //   let avatar = await wepy.downloadFile({url:info.userInfo.avatarUrl});
             let url = baseUrl + '/auth/updateUser'
             this.$parent.globalData.user.name = info.userInfo.nickName;
             this.$parent.globalData.user.avatar = info.userInfo.avatarUrl;
@@ -828,47 +886,66 @@
     preventTouchMove() {
 
       }
+    async getOtherTraces(){
+      let self = this;
+      let latitude1,longitude1,range_x1,range_y1,range_x2,range_y2,width1,height1;
+      latitude1 = self.latitude
+      longitude1 = self.longitude
+      range_x1 = self.latitude+0.25
+      range_y1 = self.longitude+0.25
+      range_x2 = self.latitude-0.25
+      range_y2 = self.longitude-0.25
+      width1 = self.width;
+      height1 = self.height;
+      self.markers = []
+      // self.markers.push({    //markers的第一个数据永远是当前位置，其他的数据来自trace表
+      //   iconPath: '/static/images/occupy.png',
+      //   id: 0,
+      //   latitude: self.curLatitude,
+      //   longitude: self.curLongitude,
+      //   width: 40,
+      //   height: 40,
+      //   avatars:[],
+      //   traceIds:[]
+      // })
+      // let offset = (res.northeast.latitude-res.southwest.latitude)*40/self.height
+      // self.markers[0].latitude = self.curLatitude - offset
+      let url = baseUrl + `/trace/getTraces?latitude=${latitude1}&longitude=${longitude1}&range_x1=${range_x1}&range_y1=${range_y1}&range_x2=${range_x2}&range_y2=${range_y2}&width=${width1}&height=${height1}`;
+      const traces = await req.get(url).catch((err)=>{
+        console.log("updateAvatarError...", err.data)})
+      self.markers = _.union(self.markers,traces.data.data)
+      console.log("self.",self.markers)
+      self.$apply();
+      // if(self.isDisplay){
+      //   setTimeout(async()=>{
+      //     await self.drawAvatar(self.markers);
+      //   },200)
+      // }
+    }
     methods = {
-      large(){
-        let self = this;
-        this.mapCtx.getCenterLocation({
-          success (res) {
-            self.latitude = res.latitude;
-            self.longitude = res.longitude;
-            self.scale = self.scale+1;
-            console.log("this.scale+++++++++++++",self.scale)
-            self.$apply();
-          }
-        })
-        this.mapCtx.getRegion({
-          success: function(res){
-            self.range_x = res.northeast.latitude;
-            self.range_y = res.northeast.longitude;
-            console.log("getregion-----",self.range_x,self.range_y)
-            self.$apply();
-          }
-        })
-        //console.log("large之后=====",this.latitude,this.longitude)
+      bindFormSubmit(e){
+        this.content = e.detail.value;
+        this.$apply();
       },
-      narrow(){
-        let self = this;
-        this.mapCtx.getCenterLocation({
-          success (res) {
-            self.latitude = res.latitude;
-            self.longitude = res.longitude;
-            self.scale = self.scale-1;
-            console.log("this.scale-------------------",self.scale)
-            self.$apply();
-          }
-        })
-        this.mapCtx.getRegion({
-          success: function(res){
-            self.range_x = res.northeast.latitude;
-            self.range_y = res.northeast.longitude;
-            console.log("getregion-----",self.range_x,self.range_y)
-            self.$apply();
-          }
-        })
+      async large(){
+        if(this.scale<21){
+          this.scale = this.scale+1;
+          this.markers = []
+          this.$apply();
+          if(this.isDisplay){
+            await this.getTraces()
+          }             
+        }  
+      },
+      async narrow(){
+        if(this.scale>5){
+          this.scale = this.scale-1;
+          this.markers = []
+          this.$apply();
+          if(this.isDisplay){
+            await this.getTraces()
+          }          
+        } 
       },
       disPlay(){
         if(this.isDisplay){
@@ -878,9 +955,11 @@
         }else{
           this.isDisplay = true;
           this.buttonContent = '不显示占领者'
+          this.markers = []
+          this.$apply();
           this.getTraces();
         }
-        
+        this.$apply();
       },
       async hideModal(){
         this.closeModal();
@@ -902,14 +981,14 @@
           },
           fail: function (err){
            // wx.navigateBack({url: `/pages/occupy?imgbox=${e.imgbox}`})
-           console.log("err============",err)
           }
         })
       },
       async confirm(e) {       
         let url = baseUrl + '/trace/addTrace';
+        console.log(this.content)
         let declaration = this.content.substring(5,this.content.length)
-        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.markers[0].latitude, 'longitude': this.markers[0].longitude, 'scenic': this.scenic, 'declaration':declaration, 'province':this.province, 'city':this.city}
+        const setData = {'userId':this.$parent.globalData.user.id, 'latitude': this.curLatitude, 'longitude': this.curLongitude, 'scenic': this.scenic, 'declaration':declaration, 'province':this.province, 'city':this.city, 'onmap':1}
         const result = await req.post(url, setData).catch((err)=>{
           console.log("updateAvatarError...", err.data)})
         
@@ -927,14 +1006,14 @@
                   'content-type':'multipart/form-data'
               },
                 success(res){
-                  console.log(res)
                 }
               })
             })(i)
           }   
         }
        // this.onLoad()
-       this.id = result.data.data.traceId; 
+       this.id = result.data.data.traceId;
+       this.$parent.globalData.user.new = true;
        this.afterOccupy(result.data.data.traceId,this.iconPath);
         //wx.navigateTo({url: `/pages/traceshow?traceId=${result.data.data.traceId}&latitude=${this.markers[0].latitude}&longitude=${this.markers[0].longitude}`})
       },

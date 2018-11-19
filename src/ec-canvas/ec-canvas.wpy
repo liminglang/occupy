@@ -74,9 +74,6 @@
           }
 
           const ctx = wx.createCanvasContext(this.canvasId, this);
-          ctx.drawImage('/static/images/bg.png',0,0,500,500)
-          ctx.save()
-          ctx.draw()
           const canvas = new WxCanvas(ctx);
 
           echarts.setCanvasCreator(() => {

@@ -4,10 +4,6 @@
     width: 100%;
   }
   
-  .list {
-    margin-top: 15px;
-    
-  }
   .gps {
     height:15px;
     width:15px;
@@ -16,14 +12,6 @@
   .image {
     width: 15%;
     border-radius: 50%;
-  }
-  .a{
-    margin: 5%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 12%;
-    width: 100%;
   }
  
 .add {
@@ -43,7 +31,7 @@
     display:inline-block;
     width:5%;
     margin-left:3%;
-    height:35%;
+    height: 35%;
   }
   .two_avatar {
     border-radius: 50%;
@@ -137,7 +125,9 @@
     height:100%;
     margin:0 auto;
     justify-content:center;
-    border:1px solid #EBEBEB
+    border:1px solid #EBEBEB;
+    display: flex;
+    flex-wrap:wrap;
   }
   .two_pic-box{  
     width:90%;
@@ -147,7 +137,9 @@
   .two_ap-box{  
     position: relative;
     width:30%;
-    height:100%;
+    height:30%;
+    margin-top:10px;
+    margin-left: 3%
   }
   .two_add-pic{  
     width:100%;
@@ -156,7 +148,7 @@
 .date{
     color:#939393;
     font-size:10pt;
-    margin-left:25%;
+    margin-left:5%;
   }
   .c{
     color:#019B79;
@@ -171,7 +163,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 12%;
+   // height: 12%;
     width: 100%;
   }
   .button{
@@ -182,81 +174,106 @@
     font-size:12px;
     margin-left:35%;
   }
+  .list{
+    position:fixed;
+    width:100%;
+  }
+  .more{
+    font-size:14pt;
+    color:#019B79;
+    margin-top:-5%;
+    text-align:center;
+  }
+  .two_number{
+    width:30px;
+    text-align:center;
+    color:#019B79;
+    font-size:13pt;
+  }
 </style>
 <template>
   <view style='height:{{height}}px;width:{{width}}'>
     <!-- <view class='slogon'>获赞数越多排序越靠前,快邀请好友助力吧！</view> -->
-    <image class='add' src='/static/images/card.png'></image>
-    <view class="two_a">
-      <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{list[index].avatar}}"></image>
-      <view class='two_text'>
-        <view class='two_content'>{{name}}</view>
-        <view class='two_declaration'>{{list[index].declaration}}</view>
-        <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
-        <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{list[index].city}}.{{list[index].scenic}}</view>
+    <view wx:if='{{isOccupied}}' class style='height:{{height}}px;width:{{width}}'>
+      <image class='add' src='/static/images/card.jpg'></image>
+      <view class="two_a">
+        <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{list[index].avatar}}" @tap='showModal({{index}})'></image>
+        <view class='two_text' @tap='showModal({{index}})'>
+          <view class='two_content'>{{name}}</view>
+          <view class='two_declaration'>{{list[index].declaration}}</view>
+          <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
+          <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{list[index].city}} · {{list[index].scenic}}</view>
+        </view>
+        <image class="two_heart" mode="aspectFit" src="{{list[index].imageUrl}}" @tap='changeParisecount({{id}},{{index}})'></image>
+        <view wx:if="{{list[index].parisecount}}" style='display:inline-block;margin-left:5px;'>{{list[index].parisecount}}</view>
       </view>
-      <image class="two_heart" mode="aspectFit" src="{{list[index].imageUrl}}" @tap='changeParisecount({{id}},{{index}})'></image>
-      <view wx:if="{{list[index].parisecount}}" style='display:inline-block;margin-left:5px;'>{{list[index].parisecount}}</view>
+      <view class='order'>占领此处排名  {{list[index].number}}</view>
+      <button class='confirm' open-type="share">邀请好友助力</button>
     </view>
-    <view class='order'>占领此处排名  {{list[index].number}}</view>
-    <button class='confirm' open-type="share">邀请好友助力</button>
-    
-    <repeat for="{{list}}" key="index" index="index" item="item" style='height:70%'>
-      <view wx:if='{{index<showCount}}' style='height:25%'>
-          <view class="a">
-            <view wx:if='{{index==0}}'>
-              <image style='width:30px' mode="aspectFit" src="/static/images/n1.png"></image>
-            </view>
-            <view wx:if='{{index==1}}'>
-              <image style='width:30px' mode="aspectFit" src="/static/images/n2.png"></image>
-            </view>
-            <view wx:if='{{index==2}}'>
-              <image style='width:30px' mode="aspectFit" src="/static/images/n3.png"></image>
-            </view>
-            <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{item.avatar}}" @tap='showModal({{index}})'></image>
-            <view class='two_text'>
-              <view class='two_content'>{{name}}</view>
-              <view class='two_declaration'>{{item.declaration}}</view>
-              <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
-              <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{item.city}}.{{item.scenic}}</view>
-            </view>
-            <image class="two_heart" mode="aspectFit" style='height:20px;' src="{{item.imageUrl}}" @tap='changeParisecount({{item.id}},{{index}})'></image>
-            <view wx:if="{{item.parisecount}}" style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
+    <scroll-view scroll-y class = 'list' style='top:{{scroll_top}}px;height:{{scroll_height}}px'>
+      <repeat for="{{list}}" key="index" index="index" item="item" style='height:70%;top:35%'>
+        
+          <view wx:if='{{index<showCount}}' style='height:25%' >
+              <view class="a">
+                <view wx:if='{{index==0}}'>
+                  <image style='width:30px;height:30px' mode="aspectFit" src="/static/images/n1.png"></image>
+                </view>
+                <view wx:if='{{index==1}}'>
+                  <image style='width:30px;height:30px' mode="aspectFit" src="/static/images/n2.png"></image>
+                </view>
+                <view wx:if='{{index==2}}'>
+                  <image style='width:30px;height:30px' mode="aspectFit" src="/static/images/n3.png"></image>
+                </view>
+                <view wx:if='{{index>2}}'>
+                  <view class='two_number'>{{index+1}}</view>
+                </view>
+                <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{item.avatar}}" @tap='showModal({{index}})'></image>
+                <view class='two_text' @tap='showModal({{index}})'>
+                  <view class='two_content'>{{item.name}}</view>
+                  <view wx:if='{{item.declaration}}' class='two_declaration'>{{item.declaration}}</view>
+                  <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
+                  <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{item.city}}.{{item.scenic}}</view>
+                </view>
+                <image class="two_heart" mode="aspectFit" style='height:20px;' src="{{item.imageUrl}}" @tap='changeParisecount({{item.id}},{{index}})'></image>
+                <view wx:if="{{item.parisecount}}" style='display:inline-block;margin-left:5px;'>{{item.parisecount}}</view>
+              </view>
           </view>
+      </repeat>
+      <view wx:if='{{moreButton}}' class='more' @tap='more'>
+        <view>加载更多</view>
+        <image class='two_heart' style='height:20px;' src='/static/images/more.png'> </image>
       </view>
-    </repeat>
+    </scroll-view>
     <cover-view class="modal-mask" @tap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></cover-view>
     <view class="modal-dialog" wx:if="{{showModal}}">
         <image class='close' mode='aspectFit' src='/static/images/close_pic.jpg' bindtap='closeModal'></image>
         <view class="a">
-          <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{list[index].avatar}}"></image>
+          <image class="two_avatar" style='height:{{avatar_height}}px;width:{{avatar_height}}px' mode="aspectFit" src="{{list[curSelect].avatar}}"></image>
           <view class='two_text'>
-            <view class='two_content'>{{list[index].name}}</view>
-            <view class='two_declaration'>{{list[index].declaration}}</view>
+            <view class='two_content'>{{list[curSelect].name}}</view>
+            <view wx:if='{{list[curSelect].declaration}}' class='two_declaration'>{{list[curSelect].declaration}}</view>
           </view>
-          <image class="two_heart" mode="aspectFit" src="{{list[index].imageUrl}}" @tap='changeParisecount({{id}},{{index}})'></image>
-          <view wx:if="{{list[index].parisecount}}" style='display:inline-block;margin-left:5px;'>{{list[index].parisecount}}</view>
+          <image class="two_heart" mode="aspectFit" src="{{list[curSelect].imageUrl}}" @tap='changeParisecount({{id}},{{curSelect}})'></image>
+          <view wx:if="{{list[curSelect].parisecount}}" style='display:inline-block;margin-left:5px;'>{{list[curSelect].parisecount}}</view>
         </view>
         <view class = 'c'>
           <view style='font-size:10pt'>第</view>
-          <view style='font-size:16pt'>{{list[index].number}}</view>
+          <view style='font-size:16pt;margin-top:-2%;'>{{list[curSelect].number}}</view>
           <view style='font-size:10pt'>个占领此处</view>
         </view>
-        <view style='width:100%;height:40%;margin-top:2%'>
-          <view class='two_up-pic'>
-            <view class='flex two_pic-box'>
+         <view style='width:100%;height:40%;margin-top:2%'>
+            <view class='two_up-pic'>
               <block wx:key="imgbox" wx:for="{{imgbox}}">
                 <view class='two_ap-box'>
-                    <image class='two_add-pic' mode="aspectFit" src='{{item}}' @tap="previewImage({{item}})"></image>
+                    <image class='two_add-pic' mode="aspectFill" src='{{item}}' @tap="previewImage({{item}})"></image>
                 </view>
               </block>
-            </view>
           </view>
         </view>
         <view class='a' style='margin-top:5%'>
           <!-- <navigator url="/pages/location?imgbox={{imgbox}}"  class="weui-cell weui-cell_access"  style='margin:0 auto' hover-class="weui-cell_active"> -->
           <image class="gps" src="/static/images/address.jpg" mode='aspectFit' style='margin-left:5%'></image>
-          <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;'>{{list[index].city}}.{{list[index].scenic}}</view>
+          <view style='color:#019B79;margin-left:5px;display:inline-block;font-size:10pt;width:50%'>{{list[index].city}} · {{list[index].scenic}}</view>
           <view class='date'>{{dateString}}</view>
         </view>
         <view style='width:100%;align-items: center; display:flex'>
@@ -288,13 +305,15 @@
       isOccupied:false,
       isParised:false,
       index:0,
+      curSelect:0,
       avatar_height:0,
       name:'',
       dateString:'',
-      imageUrl:"/static/images/heart.jpg",
       showCount:3,
       moreButton:false,
-      showModal:false
+      showModal:false,
+      scroll_top:0,
+      scroll_height:wepy.getSystemInfoSync().windowHeight
     } 
     async onLoad(e) {
       this.height = wepy.getSystemInfoSync().windowHeight
@@ -310,10 +329,12 @@
         self.list = traces.data.data;
         const userIds = _.pluck(self.list,'userId')
         let index = _.indexOf(userIds,this.$parent.globalData.user.id)
-        this.id = self.list[index].id;
         if(index>-1){
           self.isOccupied = true;
           self.index = index;
+          self.id = self.list[index].id;
+          self.scroll_top = 0.32*self.height;
+          self.scroll_height = 0.68*self.height;
         }
         for(var i = 0;i<self.list.length;i++){
           (function(i){
@@ -334,7 +355,7 @@
         }
         if(this.list.length>3){
           this.showCount = 3
-          this.moreButton = ture;
+          this.moreButton = true;
         }else{
           this.showCount = this.list.length
         }
@@ -350,6 +371,7 @@
       })
     }
     async getImages(traceId){
+      this.imgbox = []
       let url = baseUrl + `/image/get?traceId=${traceId}`;
       const result = await req.get(url).catch((err)=>{
         console.log("updateAvatarError...", err.data)})
@@ -397,7 +419,14 @@
         this.showCount = this.list.length;
         this.moreButton = false;
       },
+      previewImage(imageUrl){
+        wx.previewImage({
+          current: imageUrl, // 当前显示图片的http链接
+          urls: this.imgbox // 需要预览的图片http链接列表
+        })
+      },
       showModal(index){
+        this.curSelect = index;
         this.showModal = true;
         let date  = new Date(this.list[index].created*1000);
         let year = date.getFullYear();
